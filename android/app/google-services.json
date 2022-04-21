@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "128947506644",
+    "project_id": "yemeksepeti-f4347",
+    "storage_bucket": "yemeksepeti-f4347.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:128947506644:android:443a08b679b45e28185a41",
+        "android_client_info": {
+          "package_name": "com.hashimniane.restaurant_version"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "128947506644-9pvhpe5h39qt1l2ks19url290sn0r9as.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAhAzV7s1_JJAPwXbOHWHPcRzMfvXBnn1I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "128947506644-9pvhpe5h39qt1l2ks19url290sn0r9as.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "128947506644-56jerju1p197crikknkm8geuae8e1u7f.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.hashimniane.yemeksepeti"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
