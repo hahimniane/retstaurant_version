@@ -2,7 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/material.dart';
+import 'dart:io';
+import 'package:restaurant_version/From_Sulaiman/components/save_coverPhoto.dart';
 
 class Setting extends StatefulWidget {
   Setting({
@@ -16,6 +17,8 @@ class Setting extends StatefulWidget {
 class _SettingState extends State<Setting> {
   // var hintName = getEmailName();
   late var restaurantNameFromFirebase = '';
+
+  var imageFile;
 
   Future<String?> getEmailName() async {
     var restName;
@@ -196,21 +199,36 @@ class _SettingState extends State<Setting> {
                   clipBehavior: Clip.none,
                   children: <Widget>[
                     GestureDetector(
-                      onTap: () {
-                        selectFile();
+                      onTap: () async {
+                        var isComplete = await selectFile();
+                        if (isComplete != null) {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => SaveCoverPhotoPage(
+                                        imageUrl: imageFile,
+                                      )));
+                        }
                       },
-                      child: Container(
-                        width: MediaQuery.of(context).size.width,
-                        height: MediaQuery.of(context).size.height * 0.20,
-                        decoration: const BoxDecoration(
-                          image: DecorationImage(
-                            fit: BoxFit.fitWidth,
-                            image: NetworkImage(
-                              'https://firebasestorage.googleapis.com/v0/b/yemeksepeti-f4347.appspot.com/o/Main%20Menu%20photo%2FhqR2ua7lyhamnB8HaiUtZ9wJw943?alt=media&token=93ef34ad-7b46-47c0-a3a1-fdf880020bec',
-                            ),
-                          ),
-                        ),
-                      ),
+                      child: StreamBuilder<DocumentSnapshot>(
+                          stream: FirebaseFirestore.instance
+                              .collection('MenuPhotos')
+                              .doc(FirebaseAuth.instance.currentUser!.uid)
+                              .snapshots(),
+                          builder: (context, snapshot) {
+                            return Container(
+                              width: MediaQuery.of(context).size.width,
+                              height: MediaQuery.of(context).size.height * 0.20,
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                  fit: BoxFit.fitWidth,
+                                  image: NetworkImage(
+                                    snapshot.data!['image url'],
+                                  ),
+                                ),
+                              ),
+                            );
+                          }),
                     ),
                     Positioned(
                       top: MediaQuery.of(context).size.height * 0.15,
@@ -314,7 +332,7 @@ class _SettingState extends State<Setting> {
     super.initState();
   }
 
-  void selectFile() async {
+  selectFile() async {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.image,
     );
@@ -323,11 +341,14 @@ class _SettingState extends State<Setting> {
       if (result != null) {
         final path = result.files.single.path;
         setState(() {
-          // imageFile = File(path!);
+          imageFile = File(
+            path!,
+          );
           // //  avatarImage = File(path);
           //
           // print(imageFile);
         });
+        return path;
       }
     } catch (e) {
       print(e.toString());

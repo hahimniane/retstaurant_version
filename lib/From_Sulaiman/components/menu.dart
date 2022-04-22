@@ -301,7 +301,7 @@ class _MenuState extends State<Menu> {
                         return Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Container(
-                            height: double.infinity,
+                            height: MediaQuery.of(context).size.height,
                             child: Column(
                               children: [
                                 const Padding(

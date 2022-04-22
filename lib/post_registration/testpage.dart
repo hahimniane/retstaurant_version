@@ -409,15 +409,15 @@ class _FbCloneProfileState extends State<TrialPage> {
             Container(
               padding: const EdgeInsets.all(10.0),
               child: Row(
-                children: <Widget>[
-                  const Icon(
+                children: const <Widget>[
+                  Icon(
                     Icons.feedback,
                     color: Colors.black,
                   ),
-                  const SizedBox(
+                  SizedBox(
                     width: 10.0,
                   ),
-                  const Text(
+                  Text(
                     'Give feedback or report this profile',
                     style: TextStyle(fontSize: 18.0),
                   )
@@ -427,15 +427,15 @@ class _FbCloneProfileState extends State<TrialPage> {
             Container(
               padding: const EdgeInsets.all(10.0),
               child: Row(
-                children: <Widget>[
-                  const Icon(
+                children: const <Widget>[
+                  Icon(
                     Icons.block,
                     color: Colors.black,
                   ),
-                  const SizedBox(
+                  SizedBox(
                     width: 10.0,
                   ),
-                  const Text(
+                  Text(
                     'Block',
                     style: TextStyle(fontSize: 18.0),
                   )
@@ -445,15 +445,15 @@ class _FbCloneProfileState extends State<TrialPage> {
             Container(
               padding: const EdgeInsets.all(10.0),
               child: Row(
-                children: <Widget>[
-                  const Icon(
+                children: const <Widget>[
+                  Icon(
                     Icons.link,
                     color: Colors.black,
                   ),
-                  const SizedBox(
+                  SizedBox(
                     width: 10.0,
                   ),
-                  const Text(
+                  Text(
                     'Copy link to profile',
                     style: TextStyle(fontSize: 18.0),
                   )
@@ -463,15 +463,15 @@ class _FbCloneProfileState extends State<TrialPage> {
             Container(
               padding: const EdgeInsets.all(10.0),
               child: Row(
-                children: <Widget>[
-                  const Icon(
+                children: const <Widget>[
+                  Icon(
                     Icons.search,
                     color: Colors.black,
                   ),
-                  const SizedBox(
+                  SizedBox(
                     width: 10.0,
                   ),
-                  const Text(
+                  Text(
                     'Search Profile',
                     style: TextStyle(fontSize: 18.0),
                   )
