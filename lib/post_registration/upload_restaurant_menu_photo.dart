@@ -73,7 +73,7 @@ class _UploadRestaurantCoverImageState
                     ElevatedButton(
                         onPressed: () async {
                           loader = true;
-                          String result = await uploadFile();
+                          String result = await uploadFile(imageFile);
                           if (result != null) {
                             firebaseAthentications
                                 .uploadRestaurantCoverPhoto(result);
@@ -112,9 +112,10 @@ class _UploadRestaurantCoverImageState
     }
   }
 
-// biraz bekle hocam bekliyom halla halla sen varken bilgisayar hep yavas calisiyor illaki beni utandiracak lo. bursaya dondun mu
-  uploadFile() async {
-    final fileName = imageFile;
+  uploadFile(
+    File theImageFile,
+  ) async {
+    final fileName = theImageFile;
     var fileBaseName = basename(fileName.path);
     final destination = '${FirebaseAuth.instance.currentUser?.uid}';
     task = FirebaseApi.uploadFile(fileName, destination);
