@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:restaurant_version/From_Sulaiman/components/save_coverPhoto.dart';
+import 'package:restaurant_version/From_Sulaiman/components/save_profilePhoto.dart';
 
 class Setting extends StatefulWidget {
   Setting({
@@ -18,7 +19,8 @@ class _SettingState extends State<Setting> {
   // var hintName = getEmailName();
   late var restaurantNameFromFirebase = '';
 
-  var imageFile;
+  File? imageFileForTheCoverPhoto;
+  File? imageFileForTheProfilePhoto;
 
   Future<String?> getEmailName() async {
     var restName;
@@ -33,7 +35,6 @@ class _SettingState extends State<Setting> {
     return restName;
   }
 
-  @override
   final TextEditingController email = TextEditingController();
 
   final TextEditingController restaurantName = TextEditingController();
@@ -200,14 +201,16 @@ class _SettingState extends State<Setting> {
                   children: <Widget>[
                     GestureDetector(
                       onTap: () async {
-                        var isComplete = await selectFile();
+                        var isComplete = await selectFileForCoverPhoto();
                         if (isComplete != null) {
                           Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => SaveCoverPhotoPage(
-                                        imageUrl: imageFile,
-                                      )));
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => SaveCoverPhotoPage(
+                                imageUrl: imageFileForTheCoverPhoto,
+                              ),
+                            ),
+                          );
                         }
                       },
                       child: StreamBuilder<DocumentSnapshot>(
@@ -216,6 +219,12 @@ class _SettingState extends State<Setting> {
                               .doc(FirebaseAuth.instance.currentUser!.uid)
                               .snapshots(),
                           builder: (context, snapshot) {
+                            if (snapshot.hasError) {
+                              return const Text(
+                                  'Error with the databaase. try again later');
+                            } else if (!snapshot.hasData) {
+                              return const CircularProgressIndicator();
+                            }
                             return Container(
                               width: MediaQuery.of(context).size.width,
                               height: MediaQuery.of(context).size.height * 0.20,
@@ -253,42 +262,66 @@ class _SettingState extends State<Setting> {
                 Positioned(
                   top: 100.0,
                   child: GestureDetector(
-                    onTap: () {
-                      print('prfile pressed');
+                    onTap: () async {
+                      print('Hello world');
+                      var isComplete = await selectFileForProfilePhoto();
+                      if (isComplete != null) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SaveProfilePhoto(
+                              imageUrl: imageFileForTheProfilePhoto,
+                            ),
+                          ),
+                        );
+                      }
                     },
-                    child: Stack(clipBehavior: Clip.none, children: [
-                      Container(
-                        height: MediaQuery.of(context).size.height * 0.18,
-                        width: MediaQuery.of(context).size.width * 0.30,
-                        decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            image: const DecorationImage(
-                              fit: BoxFit.contain,
-                              image: NetworkImage(
-                                  'https://firebasestorage.googleapis.com/v0/b/yemeksepeti-f4347.appspot.com/o/RestaurantProfilePictures%2FQmDs3ANrMmZsdIuM4qgWeXtyZsi2?alt=media&token=91212474-0146-4652-8546-d2d55b322fa3'),
+                    child: StreamBuilder<DocumentSnapshot>(
+                        stream: FirebaseFirestore.instance
+                            .collection('All restaurant profile Pictures')
+                            .doc(FirebaseAuth.instance.currentUser!.uid)
+                            .snapshots(),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasError) {
+                            return const Text(
+                                'Error with the databaase. try again later');
+                          } else if (!snapshot.hasData) {
+                            return const CircularProgressIndicator();
+                          }
+                          return Stack(clipBehavior: Clip.none, children: [
+                            Container(
+                              height: MediaQuery.of(context).size.height * 0.18,
+                              width: MediaQuery.of(context).size.width * 0.30,
+                              decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  image: DecorationImage(
+                                    fit: BoxFit.contain,
+                                    image: NetworkImage(
+                                        snapshot.data!['image url']),
+                                  ),
+                                  border: Border.all(
+                                      color: Colors.white, width: 5.0)),
                             ),
-                            border:
-                                Border.all(color: Colors.white, width: 5.0)),
-                      ),
-                      Positioned(
-                        top: MediaQuery.of(context).size.height * 0.10,
-                        left: MediaQuery.of(context).size.width * 0.24,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.grey.shade300,
-                          ),
-                          height: 30,
-                          width: 30,
-                          child: const Center(
-                            child: Icon(
-                              Icons.camera_alt_rounded,
-                              size: 18,
-                            ),
-                          ),
-                        ),
-                      )
-                    ]),
+                            Positioned(
+                              top: MediaQuery.of(context).size.height * 0.10,
+                              left: MediaQuery.of(context).size.width * 0.24,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.grey.shade300,
+                                ),
+                                height: 30,
+                                width: 30,
+                                child: const Center(
+                                  child: Icon(
+                                    Icons.camera_alt_rounded,
+                                    size: 18,
+                                  ),
+                                ),
+                              ),
+                            )
+                          ]);
+                        }),
                   ),
                 ),
               ],
@@ -332,7 +365,7 @@ class _SettingState extends State<Setting> {
     super.initState();
   }
 
-  selectFile() async {
+  selectFileForCoverPhoto() async {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.image,
     );
@@ -341,12 +374,35 @@ class _SettingState extends State<Setting> {
       if (result != null) {
         final path = result.files.single.path;
         setState(() {
-          imageFile = File(
+          imageFileForTheCoverPhoto = File(
             path!,
           );
           // //  avatarImage = File(path);
           //
-          // print(imageFile);
+          print(imageFileForTheCoverPhoto);
+        });
+        return path;
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  selectFileForProfilePhoto() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.image,
+    );
+
+    try {
+      if (result != null) {
+        final path = result.files.single.path;
+        setState(() {
+          imageFileForTheProfilePhoto = File(
+            path!,
+          );
+          // //  avatarImage = File(path);
+          //
+          print(imageFileForTheProfilePhoto);
         });
         return path;
       }
