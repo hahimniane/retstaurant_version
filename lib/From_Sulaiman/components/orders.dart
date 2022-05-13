@@ -14,7 +14,7 @@ class _OrderState extends State<Order> {
   @override
   Widget build(BuildContext context) {
     final _kTapPages = <Widget>[
-      const PenOrders(),
+      PenOrders(),
       const DelOrders(),
     ];
     final _kTabs = <Tab>[

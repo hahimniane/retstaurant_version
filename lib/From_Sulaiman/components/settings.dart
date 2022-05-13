@@ -6,6 +6,9 @@ import 'dart:io';
 import 'package:restaurant_version/From_Sulaiman/components/save_coverPhoto.dart';
 import 'package:restaurant_version/From_Sulaiman/components/save_profilePhoto.dart';
 
+import '../../trial_page_for textfield.dart';
+import '../../trying.dart';
+
 class Setting extends StatefulWidget {
   Setting({
     Key? key,
@@ -170,7 +173,10 @@ class _SettingState extends State<Setting> {
       child: MaterialButton(
         padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
         minWidth: MediaQuery.of(context).size.width,
-        onPressed: () {},
+        onPressed: () {
+          // Navigator.push(context,
+          //     MaterialPageRoute(builder: (context) => BottomSheetState()));
+        },
         child: const Text(
           'Update Setting',
           textAlign: TextAlign.center,
