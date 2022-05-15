@@ -4,11 +4,14 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:restaurant_version/averege_price_page.dart';
 import 'package:restaurant_version/post_registration/page1.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:restaurant_version/registration/setup_profile.dart';
 
 import '../From_Sulaiman/screens/home_screen.dart';
+import '../From_Sulaiman/screens/login_screen.dart';
+import '../average_time_page.dart';
 
 class FirebaseAthentications {
   FirebaseAuth auth = FirebaseAuth.instance;
@@ -62,8 +65,10 @@ class FirebaseAthentications {
                 }, SetOptions(merge: true)),
               })
           .then((value) => {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => const HomeScreen()))
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const AveragePricePage()))
               })
           .then((value) => {
                 firestore
@@ -78,6 +83,10 @@ class FirebaseAthentications {
           .then((value) => {
                 defaultRestaurantProfilePicFunction(
                     'https://firebasestorage.googleapis.com/v0/b/yemeksepeti-f4347.appspot.com/o/RestaurantProfilePictures%2FdefaultImage.jpg?alt=media&token=de43d688-d144-4c61-94e1-bbdf641623ff'),
+              })
+          .then((value) => {
+                defaultRestaurantCovercFunction(
+                    'https://firebasestorage.googleapis.com/v0/b/yemeksepeti-f4347.appspot.com/o/RestaurantProfilePictures%2FdefaultCoverImage.png?alt=media&token=587a0fae-380a-4a05-8600-742e2dd8de8d'),
               });
     } on FirebaseAuthException catch (e) {
       Fluttertoast.showToast(
@@ -280,7 +289,7 @@ class FirebaseAthentications {
     firestore
         .collection('MenuPhotos')
         .doc(auth.currentUser!.uid)
-        .set({'image url': imageUrl}).then((value) => {
+        .set({'image url cover photo': imageUrl}).then((value) => {
               firestore
                   .collection('Restaurants')
                   .doc(auth.currentUser!.uid)
@@ -327,6 +336,45 @@ class FirebaseAthentications {
               // Navigator.push(context,
               //     MaterialPageRoute(builder: (context) => const FirstPage()),
               // ),
+            });
+  }
+
+  defaultRestaurantCovercFunction(
+    imageUrl,
+  ) {
+    firestore.collection('MenuPhotos').doc(auth.currentUser!.uid).set({
+      'image url cover photo': imageUrl,
+    }).then((value) => {
+          firestore.collection('Restaurants').doc(auth.currentUser!.uid).set({
+            'image url cover photo': imageUrl,
+          }, SetOptions(merge: true)),
+          // Navigator.push(context,
+          //     MaterialPageRoute(builder: (context) => const FirstPage()),
+          // ),
+        });
+  }
+
+  void updateAverageRestaurantPrice(averagePrice, context) {
+    firestore
+        .collection("Restaurants Database")
+        .doc(auth.currentUser!.uid)
+        .set({
+      'average price': averagePrice,
+    }, SetOptions(merge: true)).then((value) => {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => AverageTimePage()))
+            });
+  }
+
+  void updateAverageRestaurantTime(averageTime, context) {
+    firestore
+        .collection("Restaurants Database")
+        .doc(auth.currentUser!.uid)
+        .set({
+      'average time': averageTime,
+    }, SetOptions(merge: true)).then((value) => {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const HomeScreen()))
             });
   }
 }

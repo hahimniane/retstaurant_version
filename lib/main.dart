@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
           brightness: Brightness.light,
           primaryColor: Colors.deepOrange[800]),
       home: FirebaseAuth.instance.currentUser != null
-          ? const AveragePricePage()
+          ? const HomeScreen()
           //HomeScreen()
           : const LoginScreen(),
     );

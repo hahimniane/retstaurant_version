@@ -238,7 +238,7 @@ class _SettingState extends State<Setting> {
                                 image: DecorationImage(
                                   fit: BoxFit.fitWidth,
                                   image: NetworkImage(
-                                    snapshot.data!['image url'],
+                                    snapshot.data!['image url cover photo'],
                                   ),
                                 ),
                               ),

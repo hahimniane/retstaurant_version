@@ -44,6 +44,7 @@ class _MenuState extends State<Menu> {
   late int imageType;
 
   bool loader = false;
+  // bool controller = true;
 
   FirebaseAthentications firebaseAthentications = FirebaseAthentications();
 
@@ -211,10 +212,21 @@ class _MenuState extends State<Menu> {
                 (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
               if (snapshot.hasError) {
                 return const Text('Something went wrong');
-              }
+              } else if (snapshot.data!.docs.isEmpty) {
+                // WidgetsBinding.instance.addPostFrameCallback((_) {
+                //   setState(() {
+                //     snapshot.data!.docs.isEmpty ? controller = false : true;
+                //   });
+                // });
 
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Text("Loading");
+                return Center(
+                    child: Text(
+                  "You don't have any menus yet",
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: MediaQuery.of(context).size.width * 0.066,
+                  ),
+                ));
               }
               if (!snapshot.hasData) {
                 return const Center(
