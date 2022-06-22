@@ -1,16 +1,7 @@
-import 'dart:async';
-
-import 'package:badges/badges.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:new_project/screens/post_login/first_page.dart';
-import 'package:new_project/screens/post_login/firstorderpage.dart';
-import 'package:new_project/screens/post_login/product_detail_page.dart';
-import 'package:new_project/screens/post_login/restaurant_menu_information_page.dart';
-import 'package:new_project/screens/post_login/restaurants_list.dart';
 
+import 'addtional_chat.dart';
 import 'call_page.dart';
 import 'chat.dart';
 
@@ -25,9 +16,9 @@ class _SupportPageState extends State<SupportPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Get Help'),
-      ),
+      // appBar: AppBar(
+      //   title: const Text('Get Help'),
+      // ),
       body: Center(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -35,9 +26,8 @@ class _SupportPageState extends State<SupportPage> {
 
           // mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 8.0, vertical: 16),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 16),
               child: Text('How can we assist you?',
                   style: TextStyle(
                     color: Colors.pink,
@@ -45,21 +35,21 @@ class _SupportPageState extends State<SupportPage> {
                     fontSize: 20,
                   )),
             ),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             GestureDetector(
               onTap: () {
                 Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => CallPage()));
+                    MaterialPageRoute(builder: (context) => const CallPage()));
               },
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Row(
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
+                      const Padding(
+                        padding: EdgeInsets.symmetric(
                           horizontal: 3.0,
                         ),
                         child: Icon(
@@ -67,7 +57,7 @@ class _SupportPageState extends State<SupportPage> {
                           color: Colors.grey,
                         ),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 10,
                       ),
                       Text('Get help with a phone call',
@@ -75,8 +65,8 @@ class _SupportPageState extends State<SupportPage> {
                               fontSize: 18, color: Colors.grey.shade700)),
                     ],
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 5.0),
+                  const Padding(
+                    padding: EdgeInsets.only(right: 5.0),
                     child: Icon(
                       Icons.arrow_forward_ios_outlined,
                       color: Colors.pink,
@@ -85,7 +75,7 @@ class _SupportPageState extends State<SupportPage> {
                 ],
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             Padding(
@@ -96,21 +86,21 @@ class _SupportPageState extends State<SupportPage> {
                       color: Colors.green,
                       border: Border.all(color: Colors.grey))),
             ),
-            SizedBox(
+            const SizedBox(
               height: 40,
             ),
             GestureDetector(
               onTap: () {
                 Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => ChatPage()));
+                    MaterialPageRoute(builder: (context) => ChatPages()));
               },
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Row(
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
+                      const Padding(
+                        padding: EdgeInsets.symmetric(
                           horizontal: 3.0,
                         ),
                         child: Icon(
@@ -118,7 +108,7 @@ class _SupportPageState extends State<SupportPage> {
                           color: Colors.grey,
                         ),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 10,
                       ),
                       Text('Chat with a representative',
@@ -126,8 +116,8 @@ class _SupportPageState extends State<SupportPage> {
                               fontSize: 18, color: Colors.grey.shade700)),
                     ],
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 5.0),
+                  const Padding(
+                    padding: EdgeInsets.only(right: 5.0),
                     child: Icon(
                       Icons.arrow_forward_ios_outlined,
                       color: Colors.pink,
@@ -136,7 +126,7 @@ class _SupportPageState extends State<SupportPage> {
                 ],
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 5,
             ),
             Padding(

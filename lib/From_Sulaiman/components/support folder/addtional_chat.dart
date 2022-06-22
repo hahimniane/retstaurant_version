@@ -4,38 +4,39 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-class ChatPage extends StatefulWidget {
-  var id;
-  ChatPage({Key? key, required this.id}) : super(key: key);
+class ChatPages extends StatefulWidget {
+  String? id;
+  ChatPages({Key? key, this.id}) : super(key: key);
 
   @override
-  State<ChatPage> createState() => _ChatPageState();
+  State<ChatPages> createState() => _ChatPagesState();
 }
 
-class _ChatPageState extends State<ChatPage> {
+class _ChatPagesState extends State<ChatPages> {
   late String message;
+  FirebaseAuth auth = FirebaseAuth.instance;
   TextEditingController _controller = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   title: Text('InstaFood'),
-      // ),
+      appBar: AppBar(
+        title: Text('Ravie'),
+      ),
       body: SafeArea(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
-                  .collection('Customers')
-                  .doc(widget.id)
+                  .collection('Restaurants')
+                  .doc(auth.currentUser!.uid)
                   .collection('Chats')
                   .orderBy('timestamp', descending: true)
                   .snapshots(),
               builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
                 if (!snapshot.hasData) {
-                  return CircularProgressIndicator();
+                  return const CircularProgressIndicator();
                 } else {
                   return Expanded(
                     child: ListView(
@@ -92,10 +93,26 @@ class _ChatPageState extends State<ChatPage> {
                                   ? Container(
                                       height: 28,
                                       width: 28,
+                                      child: FutureBuilder<DocumentSnapshot>(
+                                          future: FirebaseFirestore.instance
+                                              .collection('Restaurants')
+                                              .doc(auth.currentUser!.uid)
+                                              .get(),
+                                          builder: (context, snapshot) {
+                                            if (snapshot.hasData) {
+                                              return Image.network(snapshot
+                                                  .data!['profile image url']);
+                                            }
+                                            return Container();
+                                          }))
+                                  //   Image.asset(
+                                  //       'images/logo-modified.png'),
+                                  // )
+                                  : Container(
+                                      height: 28,
+                                      width: 28,
                                       child: Image.asset(
-                                          'images/logo-modified.png'),
-                                    )
-                                  : SizedBox(),
+                                          'images/logo-modified.png'))
                             ],
                           ),
                         );
@@ -128,7 +145,7 @@ class _ChatPageState extends State<ChatPage> {
                             borderRadius: BorderRadius.circular(18),
                           ),
                           iconColor: Colors.green,
-                          hintStyle: TextStyle(
+                          hintStyle: const TextStyle(
                             color: Colors.grey,
                           ),
                           hintText: 'Aa',
@@ -137,8 +154,8 @@ class _ChatPageState extends State<ChatPage> {
                               print(message);
                               if (message.isNotEmpty) {
                                 FirebaseFirestore.instance
-                                    .collection('Customers')
-                                    .doc(widget.id)
+                                    .collection('Restaurants')
+                                    .doc(auth.currentUser!.uid)
                                     .collection('Chats')
                                     .add({
                                   'message': message,
@@ -156,7 +173,7 @@ class _ChatPageState extends State<ChatPage> {
                                 backgroundColor: Colors.pink,
                                 child: Transform.rotate(
                                   angle: 32.2,
-                                  child: Icon(
+                                  child: const Icon(
                                     FontAwesomeIcons.solidPaperPlane,
                                     color: Colors.white,
                                   ),

@@ -20,7 +20,7 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('InstaFood'),
+        title: const Text('Ravie'),
       ),
       body: SafeArea(
         child: Column(
@@ -28,14 +28,14 @@ class _ChatPageState extends State<ChatPage> {
           children: [
             StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
-                  .collection('Customers')
+                  .collection('Restaurants')
                   .doc(FirebaseAuth.instance.currentUser!.uid)
                   .collection('Chats')
                   .orderBy('timestamp', descending: true)
                   .snapshots(),
               builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
                 if (!snapshot.hasData) {
-                  return CircularProgressIndicator();
+                  return const CircularProgressIndicator();
                 } else {
                   return Expanded(
                     child: ListView(
@@ -57,12 +57,12 @@ class _ChatPageState extends State<ChatPage> {
                                 borderRadius:
                                     FirebaseAuth.instance.currentUser!.uid ==
                                             data['sender']
-                                        ? BorderRadius.only(
+                                        ? const BorderRadius.only(
                                             topLeft: Radius.circular(30),
                                             bottomLeft: Radius.circular(30),
                                             topRight: Radius.circular(30),
                                           )
-                                        : BorderRadius.only(
+                                        : const BorderRadius.only(
                                             bottomRight: Radius.circular(30),
                                             bottomLeft: Radius.circular(30),
                                             topRight: Radius.circular(30),
@@ -119,7 +119,7 @@ class _ChatPageState extends State<ChatPage> {
                             borderRadius: BorderRadius.circular(18),
                           ),
                           iconColor: Colors.green,
-                          hintStyle: TextStyle(
+                          hintStyle: const TextStyle(
                             color: Colors.grey,
                           ),
                           hintText: 'Aa',
@@ -128,7 +128,7 @@ class _ChatPageState extends State<ChatPage> {
                               print(message);
                               if (message.isNotEmpty) {
                                 FirebaseFirestore.instance
-                                    .collection('Customers')
+                                    .collection('Restaurants')
                                     .doc(FirebaseAuth.instance.currentUser!.uid)
                                     .collection('Chats')
                                     .add({
@@ -147,7 +147,7 @@ class _ChatPageState extends State<ChatPage> {
                                 backgroundColor: Colors.pink,
                                 child: Transform.rotate(
                                   angle: 32.2,
-                                  child: Icon(
+                                  child: const Icon(
                                     FontAwesomeIcons.solidPaperPlane,
                                     color: Colors.white,
                                   ),
