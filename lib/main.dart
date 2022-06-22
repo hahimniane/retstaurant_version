@@ -24,9 +24,10 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
-          primarySwatch: Colors.deepOrange,
-          brightness: Brightness.light,
-          primaryColor: Colors.deepOrange[800]),
+        primarySwatch: Colors.deepOrange,
+        brightness: Brightness.light,
+        primaryColor: Colors.deepOrange[800],
+      ),
       home: FirebaseAuth.instance.currentUser != null
           ? const HomeScreen()
           //HomeScreen()

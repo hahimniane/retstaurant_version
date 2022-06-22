@@ -1,7 +1,5 @@
 import 'dart:io';
-import 'dart:math';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:file_picker/file_picker.dart';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -136,16 +134,16 @@ class _CreateMenuPageState extends State<CreateMenuPage> {
                         onPressed: () async {
                           loader = true;
                           String result = await uploadFile();
-                          if (result != null) {
-                            firebaseAthentications.getLastMenNumber(
-                                nameController.text,
-                                descriptionController.text,
-                                priceController.text,
-                                result,
-                                ingredient1Controller.text,
-                                ingredient2Controller.text,
-                                ingredient3nameController.text);
-                          }
+                          // if (result != null) {
+                          //   firebaseAthentications.getLastMenNumber(
+                          //       nameController.text,
+                          //       descriptionController.text,
+                          //       priceController.text,
+                          //       result,
+                          //       ingredient1Controller.text,
+                          //       ingredient2Controller.text,
+                          //       ingredient3nameController.text);
+                          // }
                           // var result = await FirebaseStorage.instance
                           //     .ref('menus')
                           //     .child(FirebaseAuth.instance.currentUser!.uid)

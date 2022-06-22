@@ -202,8 +202,9 @@ class FirebaseAthentications {
     }
   }
 
-  getLastMenNumber(name, description, price, imageLink, ingredient1,
-      ingredient2, ingredient3) async {
+// this function checks if there is already a menu in the past then add
+  Future<bool> getLastMenNumber(name, description, price, imageLink,
+      compulsryIngredient, List ingredientsList) async {
     print(auth.currentUser!.uid);
 
     var lastMenu;
@@ -226,22 +227,39 @@ class FirebaseAthentications {
           'description': description,
           'food price': price,
           'image link': imageLink,
-          'first ingredient': ingredient1,
-          'second ingredient': ingredient2,
-          'third ingredient': ingredient3,
+          'ingredient 1': compulsryIngredient,
+          // 'first ingredient': ingredient1,
+          // 'second ingredient': ingredient2,
+          // 'third ingredient': ingredient3,
         }).then((value) => {
-                  // print( ),
-                  // firestore.collection('Restaurants/${auth.currentUser!.uid}/Menus/${value.id}').
+                  // firestore
+                  //     .collection('MenuPhotos')
                   //     .doc(auth.currentUser!.uid)
-                  //     .collection('Menus').doc().
+                  //     .set({
+                  //   'image url': imageLink,
+                  // })
+                  for (int i = 0; i < ingredientsList.length; ++i)
+                    {
+                      firestore
+                          .collection('Restaurants')
+                          .doc(auth.currentUser!.uid)
+                          .collection('Menus')
+                          .doc((int.parse(getDoc.docs.last.id) + 1).toString())
+                          .update({
+                        'ingredient ${i + 2}': ingredientsList[i].text.trim(),
 
-                  firestore
-                      .collection('MenuPhotos')
-                      .doc(auth.currentUser!.uid)
-                      .set({
-                    'image url': imageLink,
-                  })
+                        // 'food name': name,
+                        // 'description': description,
+                        // 'food price': price,
+                        // 'image link': imageLink,
+                        // 'first ingredient': ingredient1,
+                        // 'second ingredient': ingredient2,
+                        // 'third ingredient': ingredient3,
+                      }),
+                      SetOptions(merge: true)
+                    }
                 });
+        return true;
       } else {
         firestore
             .collection('Restaurants')
@@ -253,20 +271,35 @@ class FirebaseAthentications {
           'description': description,
           'food price': price,
           'image link': imageLink,
-          'first ingredient': ingredient1,
-          'second ingredient': ingredient2,
-          'third ingredient': ingredient3,
+          'ingredient 1': compulsryIngredient,
+          // 'first ingredient': ingredient1,
+          // 'second ingredient': ingredient2,
+          // 'third ingredient': ingredient3,
         }).then((value) => {
-                  // firestore
-                  //     .collection('MenuPhotos')
-                  //     .doc(auth.currentUser!.uid)
-                  //     .set({
-                  //   'image url': imageLink,
-                  //  })
+                  for (int i = 0; i < ingredientsList.length; i++)
+                    {
+                      firestore
+                          .collection('Restaurants')
+                          .doc(auth.currentUser!.uid)
+                          .collection('Menus')
+                          .doc(('1').toString())
+                          .update({
+                        'ingredient ${i + 2}': ingredientsList[i].text.trim(),
+                      }),
+                      SetOptions(merge: true),
+
+                      // firestore
+                      //     .collection('MenuPhotos')
+                      //     .doc(auth.currentUser!.uid)
+                      //     .set({
+                      //   'image url': imageLink,
+                      //  })
+                    }
                 });
+        return true;
       }
     } on FirebaseException catch (e) {
-      print(e.message);
+      return false;
     }
   }
 
@@ -345,9 +378,11 @@ class FirebaseAthentications {
     firestore.collection('MenuPhotos').doc(auth.currentUser!.uid).set({
       'image url cover photo': imageUrl,
     }).then((value) => {
-          firestore.collection('Restaurants').doc(auth.currentUser!.uid).set({
-            'image url cover photo': imageUrl,
-          }, SetOptions(merge: true)),
+          firestore.collection('Restaurants').doc(auth.currentUser!.uid).update(
+            {
+              'image url cover photo': imageUrl,
+            },
+          ),
           // Navigator.push(context,
           //     MaterialPageRoute(builder: (context) => const FirstPage()),
           // ),
@@ -361,8 +396,10 @@ class FirebaseAthentications {
         .set({
       'average price': averagePrice,
     }, SetOptions(merge: true)).then((value) => {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => AverageTimePage()))
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const AverageTimePage()))
             });
   }
 
@@ -377,4 +414,12 @@ class FirebaseAthentications {
                   MaterialPageRoute(builder: (context) => const HomeScreen()))
             });
   }
+}
+
+enum ascendingIngredientList {
+  firstIngredient,
+  secondIngredient,
+  thirdIngredient,
+  fourthIngredient,
+  fifthIngredient,
 }
