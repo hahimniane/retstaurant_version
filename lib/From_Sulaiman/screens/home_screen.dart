@@ -37,7 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
       const Home(),
       const Order(),
       Menu(),
-      SupportPage(),
+      const SupportPage(),
       Setting(),
     ];
 

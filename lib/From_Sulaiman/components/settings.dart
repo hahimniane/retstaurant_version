@@ -19,6 +19,22 @@ class Setting extends StatefulWidget {
 }
 
 class _SettingState extends State<Setting> {
+  FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  FirebaseAuth _auth = FirebaseAuth.instance;
+  Future resetEmail(String newEmail) async {
+    var message;
+    User firebaseUser = await FirebaseAuth.instance.currentUser!;
+    firebaseUser
+        .updateEmail(newEmail)
+        .then(
+          (value) => message = 'Success',
+        )
+        .then((value) => {print('updated')})
+        .catchError((onError) => message = 'error');
+    return message;
+  }
+
   // var hintName = getEmailName();
   late var restaurantNameFromFirebase = '';
 
@@ -50,132 +66,179 @@ class _SettingState extends State<Setting> {
 
   @override
   Widget build(BuildContext context) {
-    final emailField = TextFormField(
-      autofocus: false,
-      controller: email,
-      keyboardType: TextInputType.emailAddress,
-      //validator: () {},
-      onSaved: (value) {
-        email.text = value!;
-      },
-      textInputAction: TextInputAction.next,
-      decoration: InputDecoration(
-          prefixIcon: const Icon(Icons.email),
-          contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-          hintText: FirebaseAuth.instance.currentUser!.email,
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
-    );
+    final emailField = StreamBuilder<DocumentSnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('Restaurants')
+            .doc(FirebaseAuth.instance.currentUser!.uid)
+            .snapshots(),
+        builder: (context, snapshot) {
+          return TextFormField(
+            autofocus: false,
+            controller: email,
+            keyboardType: TextInputType.emailAddress,
+            //validator: () {},
+            onSaved: (value) {
+              email.text = value!;
+            },
+            textInputAction: TextInputAction.next,
+            decoration: InputDecoration(
+                prefixIcon: const Icon(Icons.email),
+                contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
+                hintText: FirebaseAuth.instance.currentUser!.email,
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10))),
+          );
+        });
 
     //=====================restaurant name input filed ==============================//
-    final restaurantNameField = TextFormField(
-      autofocus: false,
-      controller: restaurantName,
-      keyboardType: TextInputType.text,
-      validator: (value) {
-        RegExp regexp = RegExp(r'^.{3,}$');
-        if (value!.isEmpty) {
-          return ('Restaurant name is required');
-        }
-        if (!regexp.hasMatch(value)) {
-          return ("Restaurant name can't be less than 3 char");
-        }
-      },
-      onSaved: (value) {
-        restaurantName.text = value!;
-      },
-      textInputAction: TextInputAction.next,
-      decoration: InputDecoration(
-          prefixIcon: const Icon(Icons.house),
-          contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-          hintText: getEmailName().toString(),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
-    );
+    final restaurantNameField = StreamBuilder<DocumentSnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('Restaurants')
+            .doc(FirebaseAuth.instance.currentUser!.uid)
+            .snapshots(),
+        builder: (context, snapshot) {
+          return TextFormField(
+            autofocus: false,
+            controller: restaurantName,
+            keyboardType: TextInputType.text,
+            validator: (value) {
+              RegExp regexp = RegExp(r'^.{3,}$');
+              if (value!.isEmpty) {
+                return ('Restaurant name is required');
+              }
+              if (!regexp.hasMatch(value)) {
+                return ("Restaurant name can't be less than 3 char");
+              }
+            },
+            onSaved: (value) {
+              restaurantName.text = value!;
+            },
+            textInputAction: TextInputAction.next,
+            decoration: InputDecoration(
+                prefixIcon: const Icon(Icons.house),
+                contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
+                hintText: snapshot.data!['Restaurant Name'],
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10))),
+          );
+        });
 
     //=====================restaurant address input filed ==============================//
-    final restaurantAddressField = TextFormField(
-      autofocus: false,
-      controller: restaurantFullAddress,
-      keyboardType: TextInputType.text,
-      validator: (value) {
-        RegExp regexp = RegExp(r'^.{3,}$');
-        if (value!.isEmpty) {
-          return ('Restaurant address is required');
-        }
-        if (!regexp.hasMatch(value)) {
-          return ("Restaurant address can't be less than 3 char");
-        }
-      },
-      onSaved: (value) {
-        restaurantFullAddress.text = value!;
-      },
-      textInputAction: TextInputAction.next,
-      decoration: InputDecoration(
-          prefixIcon: const Icon(Icons.place),
-          contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-          hintText: "Water side",
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
-    );
+    final restaurantAddressField = StreamBuilder<DocumentSnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('Restaurants')
+            .doc(FirebaseAuth.instance.currentUser!.uid)
+            .snapshots(),
+        builder: (context, snapshot) {
+          return TextFormField(
+            autofocus: false,
+            controller: restaurantFullAddress,
+            keyboardType: TextInputType.text,
+            validator: (value) {
+              RegExp regexp = RegExp(r'^.{3,}$');
+              if (value!.isEmpty) {
+                return ('Restaurant address is required');
+              }
+              if (!regexp.hasMatch(value)) {
+                return ("Restaurant address can't be less than 3 char");
+              }
+            },
+            onSaved: (value) {
+              restaurantFullAddress.text = value!;
+            },
+            textInputAction: TextInputAction.next,
+            decoration: InputDecoration(
+                prefixIcon: const Icon(Icons.place),
+                contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
+                hintText: snapshot.data!['Community'],
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10))),
+          );
+        });
 
     //=====================restaurant address input filed ==============================//
-    final restaurantPhoneNumberField = TextFormField(
-      autofocus: false,
-      controller: restaurantPhoneNumber,
-      keyboardType: TextInputType.number,
-      validator: (value) {
-        RegExp regexp = RegExp(r'^.{3,}$');
-        if (value!.isEmpty) {
-          return ('Contact is required');
-        }
-        if (!regexp.hasMatch(value)) {
-          return ("Please enter a valid number");
-        }
-      },
-      onSaved: (value) {
-        restaurantPhoneNumber.text = value!;
-      },
-      textInputAction: TextInputAction.next,
-      decoration: InputDecoration(
-          prefixIcon: const Icon(Icons.phone),
-          contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-          hintText: "+224(**)-******",
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
-    );
+    final restaurantPhoneNumberField = StreamBuilder<DocumentSnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('Restaurants')
+            .doc(FirebaseAuth.instance.currentUser!.uid)
+            .snapshots(),
+        builder: (context, snapshot) {
+          return TextFormField(
+            autofocus: false,
+            controller: restaurantPhoneNumber,
+            keyboardType: TextInputType.number,
+            validator: (value) {
+              RegExp regexp = RegExp(r'^.{3,}$');
+              if (value!.isEmpty) {
+                return ('Contact is required');
+              }
+              if (!regexp.hasMatch(value)) {
+                return ("Please enter a valid number");
+              }
+            },
+            onSaved: (value) {
+              restaurantPhoneNumber.text = value!;
+            },
+            textInputAction: TextInputAction.next,
+            decoration: InputDecoration(
+                prefixIcon: const Icon(Icons.phone),
+                contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
+                hintText: snapshot.data!['Phone Number'],
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10))),
+          );
+        });
 
     //=====================community input filed ==============================//
-    final communityField = TextFormField(
-      autofocus: false,
-      controller: community,
-      keyboardType: TextInputType.text,
-      validator: (value) {
-        RegExp regexp = RegExp(r'^.{3,}$');
-        if (value!.isEmpty) {
-          return ('Community name is required');
-        }
-        if (!regexp.hasMatch(value)) {
-          return ("Community name can't be less than 3 char");
-        }
-      },
-      onSaved: (value) {
-        community.text = value!;
-      },
-      textInputAction: TextInputAction.next,
-      decoration: InputDecoration(
-          prefixIcon: const Icon(Icons.location_city),
-          contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-          hintText: "West Point",
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
-    );
+    final communityField = StreamBuilder<DocumentSnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('Restaurants')
+            .doc(FirebaseAuth.instance.currentUser!.uid)
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return TextFormField(
+              autofocus: false,
+              controller: community,
+              keyboardType: TextInputType.text,
+              validator: (value) {
+                RegExp regexp = RegExp(r'^.{3,}$');
+                if (value!.isEmpty) {
+                  return ('Community name is required');
+                }
+                if (!regexp.hasMatch(value)) {
+                  return ("Community name can't be less than 3 char");
+                }
+              },
+              onSaved: (value) {
+                community.text = value!;
+              },
+              textInputAction: TextInputAction.next,
+              decoration: InputDecoration(
+                  prefixIcon: const Icon(Icons.location_city),
+                  contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
+                  hintText: snapshot.data!['Restaurant Full Address'],
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10))),
+            );
+          } else
+            return CircularProgressIndicator();
+        });
 
     final updateButton = Material(
       elevation: 5,
       borderRadius: BorderRadius.circular(30),
-      color: Color(0xffFF3F02),
+      color: const Color(0xffFF3F02),
       child: MaterialButton(
         padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
         minWidth: MediaQuery.of(context).size.width,
         onPressed: () {
-          // Navigator.push(context,
-          //     MaterialPageRoute(builder: (context) => BottomSheetState()));
+          if (email.text.isNotEmpty) {
+            _firestore
+                .collection('Restaurants')
+                .doc(_auth.currentUser!.uid)
+                .set({'Email': email.text}, SetOptions(merge: true));
+          }
         },
         child: const Text(
           'Update Setting',
@@ -236,9 +299,9 @@ class _SettingState extends State<Setting> {
                               height: MediaQuery.of(context).size.height * 0.20,
                               decoration: BoxDecoration(
                                 image: DecorationImage(
-                                  fit: BoxFit.fitWidth,
+                                  fit: BoxFit.none,
                                   image: NetworkImage(
-                                    snapshot.data!['image url cover photo'],
+                                    snapshot.data!['cover image url'],
                                   ),
                                 ),
                               ),

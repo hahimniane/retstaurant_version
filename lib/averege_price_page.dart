@@ -34,7 +34,7 @@ class _AveragePricePageState extends State<AveragePricePage> {
                   height: 20,
                 ),
                 const Text(
-                  'Choose Your Food Preparation averge time:',
+                  'Choose Your Food Preparation average price:',
                   style: TextStyle(
                     height: 1.3,
                     fontSize: 17,

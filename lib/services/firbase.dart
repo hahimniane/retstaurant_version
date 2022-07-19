@@ -61,10 +61,12 @@ class FirebaseAthentications {
                     .doc(auth.currentUser!.uid)
                     .update(
                   {
+                    'active': false,
                     'rating': '10',
                     'speed': '10',
                     'service': '10',
                     'taste': '10',
+                    // 'array': FieldValue.arrayUnion(elements)
                   },
                 ),
               })
@@ -91,6 +93,11 @@ class FirebaseAthentications {
           .then((value) => {
                 defaultRestaurantCoverFunction(
                     'https://firebasestorage.googleapis.com/v0/b/yemeksepeti-f4347.appspot.com/o/RestaurantProfilePictures%2FdefaultCoverImage.png?alt=media&token=587a0fae-380a-4a05-8600-742e2dd8de8d'),
+              })
+          .then((value) => {
+                firestore.collection('Statistics').doc('Data').set({
+                  'Total restaurants': FieldValue.increment(1),
+                }, SetOptions(merge: true))
               });
     } on FirebaseAuthException catch (e) {
       Fluttertoast.showToast(
@@ -323,18 +330,17 @@ class FirebaseAthentications {
   // }
 
   uploadRestaurantCoverPhoto(imageUrl) {
-    firestore
-        .collection('MenuPhotos')
-        .doc(auth.currentUser!.uid)
-        .update({'image url cover photo': imageUrl}).then((value) => {
-              firestore
-                  .collection(restaurantsCollection.trim())
-                  .doc(auth.currentUser!.uid)
-                  .update(
-                {'cover image url': imageUrl},
-                // SetOptions(merge: true),
-              ),
-            });
+    firestore.collection('MenuPhotos').doc(auth.currentUser!.uid).update({
+      'cover image url': imageUrl,
+    }).then((value) => {
+          firestore
+              .collection(restaurantsCollection.trim())
+              .doc(auth.currentUser!.uid)
+              .update(
+            {'cover image url': imageUrl},
+            // SetOptions(merge: true),
+          ),
+        });
   }
 
   uploadRestaurantProfilePhoto(imageUrl, [context]) {
@@ -384,14 +390,14 @@ class FirebaseAthentications {
     imageUrl,
   ) {
     firestore.collection('MenuPhotos').doc(auth.currentUser!.uid).set({
-      'image url cover photo': imageUrl,
+      'cover image url': imageUrl,
     }).then((value) => {
           firestore
               .collection(restaurantsCollection.trim())
               .doc(auth.currentUser!.uid)
               .update(
             {
-              'image url cover photo': imageUrl,
+              'cover image url': imageUrl,
             },
           ),
           // Navigator.push(context,

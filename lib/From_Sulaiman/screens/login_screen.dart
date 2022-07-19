@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -14,6 +15,9 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  late List<String> myList;
+  late String community;
+
   FirebaseAthentications firebaseFunction = FirebaseAthentications();
   // form key
   final _formKey = GlobalKey<FormState>();
@@ -161,8 +165,10 @@ class _LoginScreenState extends State<LoginScreen> {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) =>
-                                        RegistrationScreen()));
+                                    builder: (context) => RegistrationScreen(
+                                          ourList: myList,
+                                          theFirstCommunity: 'Almamya',
+                                        )));
                           },
                           child: const Text(
                             " SignUp",
