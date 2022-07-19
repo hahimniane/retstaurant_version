@@ -1,19 +1,125 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
 import '../../services/firbase.dart';
 import 'login_screen.dart';
-import 'home_screen.dart';
 
 class RegistrationScreen extends StatefulWidget {
-  const RegistrationScreen({Key? key}) : super(key: key);
+  List<String> ourList;
+  String theFirstCommunity;
+  RegistrationScreen(
+      {Key? key, required this.ourList, required this.theFirstCommunity})
+      : super(key: key);
   @override
   _RegistrationScreenState createState() => _RegistrationScreenState();
 }
 
 class _RegistrationScreenState extends State<RegistrationScreen> {
+  List<String> myList = [];
+  List<String> cities = [];
+
+  @override
+  void initState() {}
+
+  // List<String> communityItems = [
+  //   // "Almamya",
+  //   // "Boulbinet",
+  //   // "Coronthie",
+  //   // "Fotoba",
+  //   // "Kassa",
+  //   // "Kouléwondy",
+  //   // "Manquepas",
+  //   // "Sandervalia",
+  //   // "Sans-fil",
+  //   // "Témitaye",
+  //   // "Tombo",
+  //   // "Belle-vue école",
+  //   // "Belle-vue-marché",
+  //   // "Camayenne",
+  //   // "Cameroun",
+  //   // "Dixinn-cité1",
+  //   // "Dixinn-cité 2",
+  //   // "Dixinn-gare",
+  //   // "Dixinn-gare-rails",
+  //   // "Dixinn-mosquée",
+  //   // "Dixinn-port",
+  //   // " Hafia 1",
+  //   // "Hafia 2",
+  //   // " Hafia-minière",
+  //   // "Hafia-mosquée",
+  //   // "Kénien",
+  //   // "Landréah",
+  //   // "Minière-cité",
+  //   // "Boussoura",
+  //   // "Bonfi",
+  //   // "Bonfi-marché",
+  //   // "Carrière",
+  //   // "Coléah-centre",
+  //   // "Coléah-cité",
+  //   // "Domino",
+  //   // "Hermakönon",
+  //   // "Imprimerie",
+  //   // "Lanséboudji",
+  //   // "Madina-centre",
+  //   // "Madina-cité",
+  //   // "Madina-école",
+  //   // "Madina-marché",
+  //   // "Madina-mosquée",
+  //   // "Mafanco",
+  //   // "Mafonco-centre",
+  //   // "Matam",
+  //   // "Matam-lido",
+  //   // "Touguiwondy",
+  //   // " Cobaya",
+  //   // "Dar-es-salam",
+  //   // " Hamdalaye 1",
+  //   // "Hamdalaye 2",
+  //   // "Hamdalaye-mosquée",
+  //   // "Kaporo-centre",
+  //   // "Kaporo-rails",
+  //   // " Kipé",
+  //   // " Koloma 1",
+  //   // "Koloma 2",
+  //   // "Lambadji",
+  //   // "Nongo",
+  //   // "Ratoma-centre",
+  //   // "Ratoma-dispensaire",
+  //   // "Simbaya-gare",
+  //   // "Sonfonia-gare",
+  //   // "Taouyah",
+  //   // "Wanindara",
+  //   // "Yattayah",
+  //   // "Béanzin",
+  //   // "Camp Alpha Yaya Diallo",
+  //   // "Citée de l'air",
+  //   // "Dabompa, Dabondy 1",
+  //   // "Dabondy 2",
+  //   // "Dabondy 3",
+  //   // "Dabondyécole",
+  //   // "Dabondy-rails",
+  //   // "Dar-es-salam",
+  //   // "Gbéssia-centre",
+  //   // "Gbéssia-cité 1",
+  //   // "Gbessia-cité 2",
+  //   // "Gbessia-cité 3",
+  //   // "Gbéssia-école",
+  //   // "Gbéssia-port 1",
+  //   // "Gbéssia-port 2",
+  //   // "Kissosso",
+  //   // " Matoto-centre",
+  //   // "Matoto-marché",
+  //   // "Sangoya-mosquée",
+  //   // "Simbaya 1",
+  //   // "Simbaya 2",
+  //   // "Tanéné-marché",
+  //   // "Tanéné-mosquée",
+  //   // "Tombolia",
+  //   // "Yimbaya-école",
+  //   // "Yimbaya-permanence",
+  //   // "Yimbaya-tannerie"
+  // ];
+
   FirebaseAthentications firebaseFunction = FirebaseAthentications();
   @override
   // from key
@@ -27,7 +133,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final TextEditingController restaurantName = TextEditingController();
   final TextEditingController restaurantFullAddress = TextEditingController();
   final TextEditingController restaurantPhoneNumber = TextEditingController();
-  final TextEditingController community = TextEditingController();
+  // final TextEditingController community = TextEditingController();
+  String community = 'Almamya';
   @override
   Widget build(BuildContext context) {
     //=====================email input filed ==============================//
@@ -131,29 +238,29 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     );
 
     //=====================community input filed ==============================//
-    final communityField = TextFormField(
-      autofocus: false,
-      controller: community,
-      keyboardType: TextInputType.text,
-      validator: (value) {
-        RegExp regexp = RegExp(r'^.{3,}$');
-        if (value!.isEmpty) {
-          return ('Community name is required');
-        }
-        if (!regexp.hasMatch(value)) {
-          return ("Community name can't be less than 3 char");
-        }
-      },
-      onSaved: (value) {
-        community.text = value!;
-      },
-      textInputAction: TextInputAction.next,
-      decoration: InputDecoration(
-          prefixIcon: const Icon(Icons.location_city),
-          contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-          hintText: "Community",
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
-    );
+    // final communityField = TextFormField(
+    //   autofocus: false,
+    //   controller: dropdownValue as TextEditingController,
+    //   keyboardType: TextInputType.text,
+    //   validator: (value) {
+    //     RegExp regexp = RegExp(r'^.{3,}$');
+    //     if (value!.isEmpty) {
+    //       return ('Community name is required');
+    //     }
+    //     if (!regexp.hasMatch(value)) {
+    //       return ("Community name can't be less than 3 char");
+    //     }
+    //   },
+    //   onSaved: (value) {
+    //     community = value!;
+    //   },
+    //   textInputAction: TextInputAction.next,
+    //   decoration: InputDecoration(
+    //       prefixIcon: const Icon(Icons.location_city),
+    //       contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
+    //       hintText: "Community",
+    //       border: OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
+    // );
     // final restaurantFullAddressField = TextFormField(
     //   autofocus: false,
     //   controller: restaurantFullAddress,
@@ -260,7 +367,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 restaurantName.text,
                 restaurantFullAddress.text,
                 restaurantPhoneNumber.text,
-                community.text);
+                community);
           }
 
           // if (checkPasswordSync == 0) {
@@ -336,8 +443,54 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 ),
                 Padding(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 40.0, vertical: 5),
-                  child: communityField,
+                      const EdgeInsets.symmetric(horizontal: 30.0, vertical: 5),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 5),
+                    decoration: BoxDecoration(
+                      border: Border.all(width: 5, color: Colors.grey),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: StreamBuilder<DocumentSnapshot>(
+                      stream: FirebaseFirestore.instance
+                          .collection('Country')
+                          .doc('Guinea')
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        return snapshot.hasData
+                            ? DropdownButtonFormField(
+                                borderRadius: BorderRadius.circular(8),
+                                isExpanded: true,
+                                decoration: InputDecoration(
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  prefixIcon: const Icon(
+                                    Icons.my_location_sharp,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                                onChanged: (value) {
+                                  setState(() {
+                                    community = value.toString();
+                                  });
+                                },
+                                value: community,
+                                items: [
+                                  for (int i = 0;
+                                      i <= snapshot.data!['conakry'].length - 1;
+                                      ++i)
+                                    DropdownMenuItem(
+                                      child: Text(
+                                        snapshot.data!['conakry'][i],
+                                      ),
+                                      value: snapshot.data!['conakry'][i],
+                                    ),
+                                ],
+                              )
+                            : Container();
+                      },
+                    ),
+                  ),
                 ),
                 Padding(
                   padding:

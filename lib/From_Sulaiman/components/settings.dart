@@ -4,6 +4,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:restaurant_version/From_Sulaiman/components/save_coverPhoto.dart';
+import 'package:restaurant_version/From_Sulaiman/components/save_profilePhoto.dart';
+
+import '../../trial_page_for textfield.dart';
+import '../../trying.dart';
 
 class Setting extends StatefulWidget {
   Setting({
@@ -15,10 +19,27 @@ class Setting extends StatefulWidget {
 }
 
 class _SettingState extends State<Setting> {
+  FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  FirebaseAuth _auth = FirebaseAuth.instance;
+  Future resetEmail(String newEmail) async {
+    var message;
+    User firebaseUser = await FirebaseAuth.instance.currentUser!;
+    firebaseUser
+        .updateEmail(newEmail)
+        .then(
+          (value) => message = 'Success',
+        )
+        .then((value) => {print('updated')})
+        .catchError((onError) => message = 'error');
+    return message;
+  }
+
   // var hintName = getEmailName();
   late var restaurantNameFromFirebase = '';
 
-  var imageFile;
+  File? imageFileForTheCoverPhoto;
+  File? imageFileForTheProfilePhoto;
 
   Future<String?> getEmailName() async {
     var restName;
@@ -33,7 +54,6 @@ class _SettingState extends State<Setting> {
     return restName;
   }
 
-  @override
   final TextEditingController email = TextEditingController();
 
   final TextEditingController restaurantName = TextEditingController();
@@ -46,130 +66,180 @@ class _SettingState extends State<Setting> {
 
   @override
   Widget build(BuildContext context) {
-    final emailField = TextFormField(
-      autofocus: false,
-      controller: email,
-      keyboardType: TextInputType.emailAddress,
-      //validator: () {},
-      onSaved: (value) {
-        email.text = value!;
-      },
-      textInputAction: TextInputAction.next,
-      decoration: InputDecoration(
-          prefixIcon: const Icon(Icons.email),
-          contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-          hintText: FirebaseAuth.instance.currentUser!.email,
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
-    );
+    final emailField = StreamBuilder<DocumentSnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('Restaurants')
+            .doc(FirebaseAuth.instance.currentUser!.uid)
+            .snapshots(),
+        builder: (context, snapshot) {
+          return TextFormField(
+            autofocus: false,
+            controller: email,
+            keyboardType: TextInputType.emailAddress,
+            //validator: () {},
+            onSaved: (value) {
+              email.text = value!;
+            },
+            textInputAction: TextInputAction.next,
+            decoration: InputDecoration(
+                prefixIcon: const Icon(Icons.email),
+                contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
+                hintText: FirebaseAuth.instance.currentUser!.email,
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10))),
+          );
+        });
 
     //=====================restaurant name input filed ==============================//
-    final restaurantNameField = TextFormField(
-      autofocus: false,
-      controller: restaurantName,
-      keyboardType: TextInputType.text,
-      validator: (value) {
-        RegExp regexp = RegExp(r'^.{3,}$');
-        if (value!.isEmpty) {
-          return ('Restaurant name is required');
-        }
-        if (!regexp.hasMatch(value)) {
-          return ("Restaurant name can't be less than 3 char");
-        }
-      },
-      onSaved: (value) {
-        restaurantName.text = value!;
-      },
-      textInputAction: TextInputAction.next,
-      decoration: InputDecoration(
-          prefixIcon: const Icon(Icons.house),
-          contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-          hintText: getEmailName().toString(),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
-    );
+    final restaurantNameField = StreamBuilder<DocumentSnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('Restaurants')
+            .doc(FirebaseAuth.instance.currentUser!.uid)
+            .snapshots(),
+        builder: (context, snapshot) {
+          return TextFormField(
+            autofocus: false,
+            controller: restaurantName,
+            keyboardType: TextInputType.text,
+            validator: (value) {
+              RegExp regexp = RegExp(r'^.{3,}$');
+              if (value!.isEmpty) {
+                return ('Restaurant name is required');
+              }
+              if (!regexp.hasMatch(value)) {
+                return ("Restaurant name can't be less than 3 char");
+              }
+            },
+            onSaved: (value) {
+              restaurantName.text = value!;
+            },
+            textInputAction: TextInputAction.next,
+            decoration: InputDecoration(
+                prefixIcon: const Icon(Icons.house),
+                contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
+                hintText: snapshot.data!['Restaurant Name'],
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10))),
+          );
+        });
 
     //=====================restaurant address input filed ==============================//
-    final restaurantAddressField = TextFormField(
-      autofocus: false,
-      controller: restaurantFullAddress,
-      keyboardType: TextInputType.text,
-      validator: (value) {
-        RegExp regexp = RegExp(r'^.{3,}$');
-        if (value!.isEmpty) {
-          return ('Restaurant address is required');
-        }
-        if (!regexp.hasMatch(value)) {
-          return ("Restaurant address can't be less than 3 char");
-        }
-      },
-      onSaved: (value) {
-        restaurantFullAddress.text = value!;
-      },
-      textInputAction: TextInputAction.next,
-      decoration: InputDecoration(
-          prefixIcon: const Icon(Icons.place),
-          contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-          hintText: "Water side",
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
-    );
+    final restaurantAddressField = StreamBuilder<DocumentSnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('Restaurants')
+            .doc(FirebaseAuth.instance.currentUser!.uid)
+            .snapshots(),
+        builder: (context, snapshot) {
+          return TextFormField(
+            autofocus: false,
+            controller: restaurantFullAddress,
+            keyboardType: TextInputType.text,
+            validator: (value) {
+              RegExp regexp = RegExp(r'^.{3,}$');
+              if (value!.isEmpty) {
+                return ('Restaurant address is required');
+              }
+              if (!regexp.hasMatch(value)) {
+                return ("Restaurant address can't be less than 3 char");
+              }
+            },
+            onSaved: (value) {
+              restaurantFullAddress.text = value!;
+            },
+            textInputAction: TextInputAction.next,
+            decoration: InputDecoration(
+                prefixIcon: const Icon(Icons.place),
+                contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
+                hintText: snapshot.data!['Community'],
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10))),
+          );
+        });
 
     //=====================restaurant address input filed ==============================//
-    final restaurantPhoneNumberField = TextFormField(
-      autofocus: false,
-      controller: restaurantPhoneNumber,
-      keyboardType: TextInputType.number,
-      validator: (value) {
-        RegExp regexp = RegExp(r'^.{3,}$');
-        if (value!.isEmpty) {
-          return ('Contact is required');
-        }
-        if (!regexp.hasMatch(value)) {
-          return ("Please enter a valid number");
-        }
-      },
-      onSaved: (value) {
-        restaurantPhoneNumber.text = value!;
-      },
-      textInputAction: TextInputAction.next,
-      decoration: InputDecoration(
-          prefixIcon: const Icon(Icons.phone),
-          contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-          hintText: "+224(**)-******",
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
-    );
+    final restaurantPhoneNumberField = StreamBuilder<DocumentSnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('Restaurants')
+            .doc(FirebaseAuth.instance.currentUser!.uid)
+            .snapshots(),
+        builder: (context, snapshot) {
+          return TextFormField(
+            autofocus: false,
+            controller: restaurantPhoneNumber,
+            keyboardType: TextInputType.number,
+            validator: (value) {
+              RegExp regexp = RegExp(r'^.{3,}$');
+              if (value!.isEmpty) {
+                return ('Contact is required');
+              }
+              if (!regexp.hasMatch(value)) {
+                return ("Please enter a valid number");
+              }
+            },
+            onSaved: (value) {
+              restaurantPhoneNumber.text = value!;
+            },
+            textInputAction: TextInputAction.next,
+            decoration: InputDecoration(
+                prefixIcon: const Icon(Icons.phone),
+                contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
+                hintText: snapshot.data!['Phone Number'],
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10))),
+          );
+        });
 
     //=====================community input filed ==============================//
-    final communityField = TextFormField(
-      autofocus: false,
-      controller: community,
-      keyboardType: TextInputType.text,
-      validator: (value) {
-        RegExp regexp = RegExp(r'^.{3,}$');
-        if (value!.isEmpty) {
-          return ('Community name is required');
-        }
-        if (!regexp.hasMatch(value)) {
-          return ("Community name can't be less than 3 char");
-        }
-      },
-      onSaved: (value) {
-        community.text = value!;
-      },
-      textInputAction: TextInputAction.next,
-      decoration: InputDecoration(
-          prefixIcon: const Icon(Icons.location_city),
-          contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-          hintText: "West Point",
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
-    );
+    final communityField = StreamBuilder<DocumentSnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('Restaurants')
+            .doc(FirebaseAuth.instance.currentUser!.uid)
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return TextFormField(
+              autofocus: false,
+              controller: community,
+              keyboardType: TextInputType.text,
+              validator: (value) {
+                RegExp regexp = RegExp(r'^.{3,}$');
+                if (value!.isEmpty) {
+                  return ('Community name is required');
+                }
+                if (!regexp.hasMatch(value)) {
+                  return ("Community name can't be less than 3 char");
+                }
+              },
+              onSaved: (value) {
+                community.text = value!;
+              },
+              textInputAction: TextInputAction.next,
+              decoration: InputDecoration(
+                  prefixIcon: const Icon(Icons.location_city),
+                  contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
+                  hintText: snapshot.data!['Restaurant Full Address'],
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10))),
+            );
+          } else
+            return CircularProgressIndicator();
+        });
 
     final updateButton = Material(
       elevation: 5,
       borderRadius: BorderRadius.circular(30),
-      color: Color(0xffFF3F02),
+      color: const Color(0xffFF3F02),
       child: MaterialButton(
         padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
         minWidth: MediaQuery.of(context).size.width,
-        onPressed: () {},
+        onPressed: () {
+          if (email.text.isNotEmpty) {
+            _firestore
+                .collection('Restaurants')
+                .doc(_auth.currentUser!.uid)
+                .set({'Email': email.text}, SetOptions(merge: true));
+          }
+        },
         child: const Text(
           'Update Setting',
           textAlign: TextAlign.center,
@@ -200,14 +270,16 @@ class _SettingState extends State<Setting> {
                   children: <Widget>[
                     GestureDetector(
                       onTap: () async {
-                        var isComplete = await selectFile();
+                        var isComplete = await selectFileForCoverPhoto();
                         if (isComplete != null) {
                           Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => SaveCoverPhotoPage(
-                                        imageUrl: imageFile,
-                                      )));
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => SaveCoverPhotoPage(
+                                imageUrl: imageFileForTheCoverPhoto,
+                              ),
+                            ),
+                          );
                         }
                       },
                       child: StreamBuilder<DocumentSnapshot>(
@@ -216,14 +288,20 @@ class _SettingState extends State<Setting> {
                               .doc(FirebaseAuth.instance.currentUser!.uid)
                               .snapshots(),
                           builder: (context, snapshot) {
+                            if (snapshot.hasError) {
+                              return const Text(
+                                  'Error with the databaase. try again later');
+                            } else if (!snapshot.hasData) {
+                              return const CircularProgressIndicator();
+                            }
                             return Container(
                               width: MediaQuery.of(context).size.width,
                               height: MediaQuery.of(context).size.height * 0.20,
                               decoration: BoxDecoration(
                                 image: DecorationImage(
-                                  fit: BoxFit.fitWidth,
+                                  fit: BoxFit.none,
                                   image: NetworkImage(
-                                    snapshot.data!['image url'],
+                                    snapshot.data!['cover image url'],
                                   ),
                                 ),
                               ),
@@ -253,42 +331,66 @@ class _SettingState extends State<Setting> {
                 Positioned(
                   top: 100.0,
                   child: GestureDetector(
-                    onTap: () {
-                      print('prfile pressed');
+                    onTap: () async {
+                      print('Hello world');
+                      var isComplete = await selectFileForProfilePhoto();
+                      if (isComplete != null) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SaveProfilePhoto(
+                              imageUrl: imageFileForTheProfilePhoto,
+                            ),
+                          ),
+                        );
+                      }
                     },
-                    child: Stack(clipBehavior: Clip.none, children: [
-                      Container(
-                        height: MediaQuery.of(context).size.height * 0.18,
-                        width: MediaQuery.of(context).size.width * 0.30,
-                        decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            image: const DecorationImage(
-                              fit: BoxFit.contain,
-                              image: NetworkImage(
-                                  'https://firebasestorage.googleapis.com/v0/b/yemeksepeti-f4347.appspot.com/o/RestaurantProfilePictures%2FQmDs3ANrMmZsdIuM4qgWeXtyZsi2?alt=media&token=91212474-0146-4652-8546-d2d55b322fa3'),
+                    child: StreamBuilder<DocumentSnapshot>(
+                        stream: FirebaseFirestore.instance
+                            .collection('All restaurant profile Pictures')
+                            .doc(FirebaseAuth.instance.currentUser!.uid)
+                            .snapshots(),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasError) {
+                            return const Text(
+                                'Error with the databaase. try again later');
+                          } else if (!snapshot.hasData) {
+                            return const CircularProgressIndicator();
+                          }
+                          return Stack(clipBehavior: Clip.none, children: [
+                            Container(
+                              height: MediaQuery.of(context).size.height * 0.18,
+                              width: MediaQuery.of(context).size.width * 0.30,
+                              decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  image: DecorationImage(
+                                    fit: BoxFit.contain,
+                                    image: NetworkImage(
+                                        snapshot.data!['image url']),
+                                  ),
+                                  border: Border.all(
+                                      color: Colors.white, width: 5.0)),
                             ),
-                            border:
-                                Border.all(color: Colors.white, width: 5.0)),
-                      ),
-                      Positioned(
-                        top: MediaQuery.of(context).size.height * 0.10,
-                        left: MediaQuery.of(context).size.width * 0.24,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.grey.shade300,
-                          ),
-                          height: 30,
-                          width: 30,
-                          child: const Center(
-                            child: Icon(
-                              Icons.camera_alt_rounded,
-                              size: 18,
-                            ),
-                          ),
-                        ),
-                      )
-                    ]),
+                            Positioned(
+                              top: MediaQuery.of(context).size.height * 0.10,
+                              left: MediaQuery.of(context).size.width * 0.24,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.grey.shade300,
+                                ),
+                                height: 30,
+                                width: 30,
+                                child: const Center(
+                                  child: Icon(
+                                    Icons.camera_alt_rounded,
+                                    size: 18,
+                                  ),
+                                ),
+                              ),
+                            )
+                          ]);
+                        }),
                   ),
                 ),
               ],
@@ -332,7 +434,7 @@ class _SettingState extends State<Setting> {
     super.initState();
   }
 
-  selectFile() async {
+  selectFileForCoverPhoto() async {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.image,
     );
@@ -341,12 +443,35 @@ class _SettingState extends State<Setting> {
       if (result != null) {
         final path = result.files.single.path;
         setState(() {
-          imageFile = File(
+          imageFileForTheCoverPhoto = File(
             path!,
           );
           // //  avatarImage = File(path);
           //
-          // print(imageFile);
+          print(imageFileForTheCoverPhoto);
+        });
+        return path;
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  selectFileForProfilePhoto() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.image,
+    );
+
+    try {
+      if (result != null) {
+        final path = result.files.single.path;
+        setState(() {
+          imageFileForTheProfilePhoto = File(
+            path!,
+          );
+          // //  avatarImage = File(path);
+          //
+          print(imageFileForTheProfilePhoto);
         });
         return path;
       }

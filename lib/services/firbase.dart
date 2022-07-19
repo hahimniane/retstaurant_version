@@ -4,15 +4,21 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:restaurant_version/averege_price_page.dart';
 import 'package:restaurant_version/post_registration/page1.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:restaurant_version/registration/setup_profile.dart';
 
 import '../From_Sulaiman/screens/home_screen.dart';
+import '../From_Sulaiman/screens/login_screen.dart';
+import '../average_time_page.dart';
 
 class FirebaseAthentications {
   FirebaseAuth auth = FirebaseAuth.instance;
   FirebaseFirestore firestore = FirebaseFirestore.instance;
+  String restaurantsCollection = 'Restaurants';
+  String menusCollection = 'Menus';
+  String restaurantsDatabaseCollection = 'Restaurants Database';
 
   SignUpUser(
       BuildContext context,
@@ -23,7 +29,6 @@ class FirebaseAthentications {
       String phoneNumber,
       String community) async {
     try {
-      var ref;
       String? currentUser;
       var newUser = await auth.createUserWithEmailAndPassword(
           email: email, password: password);
@@ -35,7 +40,7 @@ class FirebaseAthentications {
       user?.updatePhotoURL('');
       // user?.updatePhoneNumber(PhoneAuthCredential.parse(phoneNumber));
       firestore
-          .collection("Restaurants")
+          .collection(restaurantsCollection.trim())
           .doc(auth.currentUser?.uid)
           .set({
             'Email': email,
@@ -46,24 +51,30 @@ class FirebaseAthentications {
           })
           .then((value) => {
                 firestore
-                    .collection('Restaurants')
+                    .collection(restaurantsCollection.trim())
                     .doc(auth.currentUser!.uid)
-                    .set({'user id': auth.currentUser!.uid})
+                    .update({'user id': auth.currentUser!.uid})
               })
           .then((value) => {
                 firestore
-                    .collection('Restaurants')
+                    .collection(restaurantsCollection.trim())
                     .doc(auth.currentUser!.uid)
-                    .set({
-                  'rating': '10',
-                  'speed': '10',
-                  'service': '10',
-                  'taste': '10',
-                }, SetOptions(merge: true)),
+                    .update(
+                  {
+                    'active': false,
+                    'rating': '10',
+                    'speed': '10',
+                    'service': '10',
+                    'taste': '10',
+                    // 'array': FieldValue.arrayUnion(elements)
+                  },
+                ),
               })
           .then((value) => {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => const HomeScreen()))
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const AveragePricePage()))
               })
           .then((value) => {
                 firestore
@@ -78,6 +89,15 @@ class FirebaseAthentications {
           .then((value) => {
                 defaultRestaurantProfilePicFunction(
                     'https://firebasestorage.googleapis.com/v0/b/yemeksepeti-f4347.appspot.com/o/RestaurantProfilePictures%2FdefaultImage.jpg?alt=media&token=de43d688-d144-4c61-94e1-bbdf641623ff'),
+              })
+          .then((value) => {
+                defaultRestaurantCoverFunction(
+                    'https://firebasestorage.googleapis.com/v0/b/yemeksepeti-f4347.appspot.com/o/RestaurantProfilePictures%2FdefaultCoverImage.png?alt=media&token=587a0fae-380a-4a05-8600-742e2dd8de8d'),
+              })
+          .then((value) => {
+                firestore.collection('Statistics').doc('Data').set({
+                  'Total restaurants': FieldValue.increment(1),
+                }, SetOptions(merge: true))
               });
     } on FirebaseAuthException catch (e) {
       Fluttertoast.showToast(
@@ -100,7 +120,7 @@ class FirebaseAthentications {
             .then((value) {
           bool exist;
           firestore
-              .collection('Restaurants')
+              .collection(restaurantsCollection.trim())
               .doc(auth.currentUser!.uid)
               .get()
               .then((value) => {
@@ -126,7 +146,7 @@ class FirebaseAthentications {
                   email: auth.currentUser!.email.toString(), password: password)
               .then((value) => {
                     firestore
-                        .collection('Restaurants database')
+                        .collection(restaurantsDatabaseCollection.trim())
                         .doc(auth.currentUser!.uid)
                         .get()
                         .then((value) => {
@@ -193,71 +213,104 @@ class FirebaseAthentications {
     }
   }
 
-  getLastMenNumber(name, description, price, imageLink, ingredient1,
-      ingredient2, ingredient3) async {
+// this function checks if there is already a menu in the past then add
+  Future<bool> getLastMenNumber(name, description, price, imageLink,
+      compulsoryIngredient, List ingredientsList) async {
     print(auth.currentUser!.uid);
 
     var lastMenu;
     try {
       var getDoc = await firestore
-          .collection("Restaurants")
+          .collection(restaurantsCollection.trim())
           .doc(auth.currentUser!.uid)
-          .collection('Menus')
+          .collection(menusCollection.trim())
           .get();
       // .then((QuerySnapshot querySnapshot) {
       // print(int.parse(querySnapshot.docs.last.id) + 1);
       if (getDoc.docs.isNotEmpty) {
         firestore
-            .collection('Restaurants')
+            .collection(restaurantsCollection.trim())
             .doc(auth.currentUser!.uid)
-            .collection('Menus')
+            .collection(menusCollection.trim())
             .doc((int.parse(getDoc.docs.last.id) + 1).toString())
             .set({
           'food name': name,
           'description': description,
           'food price': price,
           'image link': imageLink,
-          'first ingredient': ingredient1,
-          'second ingredient': ingredient2,
-          'third ingredient': ingredient3,
-        }).then((value) => {
-                  // print( ),
-                  // firestore.collection('Restaurants/${auth.currentUser!.uid}/Menus/${value.id}').
-                  //     .doc(auth.currentUser!.uid)
-                  //     .collection('Menus').doc().
-
-                  firestore
-                      .collection('MenuPhotos')
-                      .doc(auth.currentUser!.uid)
-                      .set({
-                    'image url': imageLink,
-                  })
-                });
-      } else {
-        firestore
-            .collection('Restaurants')
-            .doc(auth.currentUser!.uid)
-            .collection('Menus')
-            .doc(('1').toString())
-            .set({
-          'food name': name,
-          'description': description,
-          'food price': price,
-          'image link': imageLink,
-          'first ingredient': ingredient1,
-          'second ingredient': ingredient2,
-          'third ingredient': ingredient3,
+          'ingredient 1': compulsoryIngredient,
+          // 'first ingredient': ingredient1,
+          // 'second ingredient': ingredient2,
+          // 'third ingredient': ingredient3,
         }).then((value) => {
                   // firestore
                   //     .collection('MenuPhotos')
                   //     .doc(auth.currentUser!.uid)
                   //     .set({
                   //   'image url': imageLink,
-                  //  })
+                  // })
+                  for (int i = 0; i < ingredientsList.length; ++i)
+                    {
+                      firestore
+                          .collection(restaurantsCollection.trim())
+                          .doc(auth.currentUser!.uid)
+                          .collection(menusCollection.trim())
+                          .doc((int.parse(getDoc.docs.last.id) + 1).toString())
+                          .update({
+                        'ingredient ${i + 2}': ingredientsList[i].text.trim(),
+
+                        // 'food name': name,
+                        // 'description': description,
+                        // 'food price': price,
+                        // 'image link': imageLink,
+                        // 'first ingredient': ingredient1,
+                        // 'second ingredient': ingredient2,
+                        // 'third ingredient': ingredient3,
+                      }),
+                      // SetOptions(merge: true)
+                    }
                 });
+        return true;
+      } else {
+        firestore
+            .collection(restaurantsCollection.trim())
+            .doc(auth.currentUser!.uid)
+            .collection(menusCollection.trim())
+            .doc(('1').toString())
+            .set({
+          'food name': name,
+          'description': description,
+          'food price': price,
+          'image link': imageLink,
+          'ingredient 1': compulsoryIngredient,
+          // 'first ingredient': ingredient1,
+          // 'second ingredient': ingredient2,
+          // 'third ingredient': ingredient3,
+        }).then((value) => {
+                  for (int i = 0; i < ingredientsList.length; i++)
+                    {
+                      firestore
+                          .collection(restaurantsCollection.trim())
+                          .doc(auth.currentUser!.uid)
+                          .collection(menusCollection.trim())
+                          .doc(('1').toString())
+                          .update({
+                        'ingredient ${i + 2}': ingredientsList[i].text.trim(),
+                      }),
+                      // SetOptions(merge: true),
+
+                      // firestore
+                      //     .collection('MenuPhotos')
+                      //     .doc(auth.currentUser!.uid)
+                      //     .set({
+                      //   'image url': imageLink,
+                      //  })
+                    }
+                });
+        return true;
       }
     } on FirebaseException catch (e) {
-      print(e.message);
+      return false;
     }
   }
 
@@ -277,18 +330,17 @@ class FirebaseAthentications {
   // }
 
   uploadRestaurantCoverPhoto(imageUrl) {
-    firestore
-        .collection('MenuPhotos')
-        .doc(auth.currentUser!.uid)
-        .set({'image url': imageUrl}).then((value) => {
-              firestore
-                  .collection('Restaurants')
-                  .doc(auth.currentUser!.uid)
-                  .set(
-                {'cover image url': imageUrl},
-                SetOptions(merge: true),
-              ),
-            });
+    firestore.collection('MenuPhotos').doc(auth.currentUser!.uid).update({
+      'cover image url': imageUrl,
+    }).then((value) => {
+          firestore
+              .collection(restaurantsCollection.trim())
+              .doc(auth.currentUser!.uid)
+              .update(
+            {'cover image url': imageUrl},
+            // SetOptions(merge: true),
+          ),
+        });
   }
 
   uploadRestaurantProfilePhoto(imageUrl, [context]) {
@@ -299,11 +351,13 @@ class FirebaseAthentications {
       'image url': imageUrl,
     }).then((value) => {
               firestore
-                  .collection('Restaurants')
+                  .collection(restaurantsCollection.trim())
                   .doc(auth.currentUser!.uid)
-                  .set({
-                'profile image url': imageUrl,
-              }, SetOptions(merge: true)),
+                  .update(
+                {
+                  'profile image url': imageUrl,
+                },
+              ),
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) => const FirstPage())),
             });
@@ -315,18 +369,78 @@ class FirebaseAthentications {
     firestore
         .collection('All restaurant profile Pictures')
         .doc(auth.currentUser!.uid)
-        .update({
+        .set({
       'image url': imageUrl,
-    }).then((value) => {
+    }, SetOptions(merge: true)).then((value) => {
               firestore
-                  .collection('Restaurants ')
+                  .collection(restaurantsCollection.trim())
                   .doc(auth.currentUser!.uid)
-                  .set({
-                'profile image url': imageUrl,
-              }, SetOptions(merge: true)),
+                  .update(
+                {
+                  'profile image url': imageUrl,
+                },
+              ),
               // Navigator.push(context,
               //     MaterialPageRoute(builder: (context) => const FirstPage()),
               // ),
             });
   }
+
+  defaultRestaurantCoverFunction(
+    imageUrl,
+  ) {
+    firestore.collection('MenuPhotos').doc(auth.currentUser!.uid).set({
+      'cover image url': imageUrl,
+    }).then((value) => {
+          firestore
+              .collection(restaurantsCollection.trim())
+              .doc(auth.currentUser!.uid)
+              .update(
+            {
+              'cover image url': imageUrl,
+            },
+          ),
+          // Navigator.push(context,
+          //     MaterialPageRoute(builder: (context) => const FirstPage()),
+          // ),
+        });
+  }
+
+  void updateAverageRestaurantPrice(averagePrice, context) {
+    firestore
+        .collection(restaurantsCollection.trim())
+        .doc(auth.currentUser!.uid)
+        .update(
+      {
+        'average price': averagePrice,
+      },
+    ).then((value) => {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const AverageTimePage()))
+            });
+  }
+
+  void updateAverageRestaurantTime(averageTime, context) {
+    firestore
+        .collection(restaurantsCollection.trim())
+        .doc(auth.currentUser!.uid)
+        .update(
+      {
+        'average time': averageTime,
+      },
+    ).then((value) => {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const HomeScreen()))
+            });
+  }
+}
+
+enum ascendingIngredientList {
+  firstIngredient,
+  secondIngredient,
+  thirdIngredient,
+  fourthIngredient,
+  fifthIngredient,
 }

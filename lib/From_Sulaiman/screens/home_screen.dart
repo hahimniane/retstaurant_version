@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../../services/firbase.dart';
 import '../components/drawer.dart';
@@ -7,6 +8,7 @@ import '../components/home.dart';
 import '../components/menu.dart';
 import '../components/orders.dart';
 import '../components/settings.dart';
+import '../components/support folder/support_page.dart';
 import 'login_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -27,12 +29,15 @@ class _HomeScreenState extends State<HomeScreen> {
           icon: Icon(Icons.shopping_cart), label: 'Order'),
       const BottomNavigationBarItem(icon: Icon(Icons.menu_book), label: 'Menu'),
       const BottomNavigationBarItem(
+          icon: Icon(FontAwesomeIcons.headset), label: 'Support'),
+      const BottomNavigationBarItem(
           icon: Icon(Icons.settings), label: 'Setting'),
     ];
     final _kTapPages = <Widget>[
       const Home(),
       const Order(),
       Menu(),
+      const SupportPage(),
       Setting(),
     ];
 

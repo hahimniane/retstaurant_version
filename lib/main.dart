@@ -6,6 +6,7 @@ import 'package:restaurant_version/registration/register_welcome_page.dart';
 
 import 'From_Sulaiman/screens/home_screen.dart';
 import 'From_Sulaiman/screens/login_screen.dart';
+import 'averege_price_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,11 +24,13 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
-          primarySwatch: Colors.deepOrange,
-          brightness: Brightness.light,
-          primaryColor: Colors.deepOrange[800]),
+        primarySwatch: Colors.deepOrange,
+        brightness: Brightness.light,
+        primaryColor: Colors.deepOrange[800],
+      ),
       home: FirebaseAuth.instance.currentUser != null
           ? const HomeScreen()
+          //HomeScreen()
           : const LoginScreen(),
     );
   }

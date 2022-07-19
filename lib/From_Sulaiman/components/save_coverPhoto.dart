@@ -17,68 +17,120 @@ class SaveCoverPhotoPage extends StatefulWidget {
 class _SaveCoverPhotoPageState extends State<SaveCoverPhotoPage> {
   FirebaseAthentications firebaseClass = FirebaseAthentications();
   late UploadTask? task;
+
+  bool loader = false;
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: TextButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          child: ListTile(
-            title: const Center(
-                child: Text(
-              'Review',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
-              ),
-            )),
-            leading: const Text(
-              'cancel',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            trailing: TextButton(
-              onPressed: () async {
-                try {
-                  String result = await uploadFile(widget.imageUrl);
-                  if (result != null) {
-                    firebaseClass.uploadRestaurantCoverPhoto(result);
-                    Navigator.pop(context);
-                  }
-                } catch (e) {
-                  print('A problem occured');
-                }
-              },
-              child: const Text(
-                'Save',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
+    return loader
+        ? Scaffold(
+            appBar: AppBar(
+              automaticallyImplyLeading: false,
+              title: const ListTile(
+                title: Center(
+                    child: Text(
+                  'Review cover photo',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
+                )),
+                leading: Text(
+                  'cancel',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                trailing: Text(
+                  'Save',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
-          ),
-        ),
-      ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Center(
-            child: Container(
-              child: Image.file(widget.imageUrl),
+            body: Center(
+              child: Stack(clipBehavior: Clip.none, children: [
+                Center(
+                  child: Container(
+                    child: Image.file(widget.imageUrl),
+                  ),
+                ),
+                Center(
+                  child: Container(
+                      height: 50,
+                      width: 50,
+                      child: const CircularProgressIndicator()),
+                ),
+              ]),
+            ))
+        : Scaffold(
+            appBar: AppBar(
+              automaticallyImplyLeading: false,
+              title: TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: ListTile(
+                  title: const Center(
+                      child: Text(
+                    'Review cover photo',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  )),
+                  leading: const Text(
+                    'cancel',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  trailing: TextButton(
+                    onPressed: () async {
+                      try {
+                        setState(() {
+                          loader = true;
+                        });
+                        String result = await uploadFile(widget.imageUrl);
+                        if (result != null) {
+                          firebaseClass.uploadRestaurantCoverPhoto(result);
+                          Navigator.pop(context);
+                        }
+                      } catch (e) {
+                        print('A problem occured');
+                      }
+                    },
+                    child: const Text(
+                      'Save',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             ),
-          ),
-        ],
-      ),
-    );
+            body: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Center(
+                  child: Container(
+                    child: Image.file(widget.imageUrl),
+                  ),
+                ),
+              ],
+            ),
+          );
   }
 
   uploadFile(
@@ -92,7 +144,7 @@ class _SaveCoverPhotoPageState extends State<SaveCoverPhotoPage> {
       final snapshot = await task?.whenComplete(() => {});
       final url = await snapshot?.ref.getDownloadURL();
       setState(() {
-        // loader = false;
+        loader = false;
       });
       return url;
     } else {
