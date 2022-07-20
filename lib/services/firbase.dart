@@ -239,6 +239,7 @@ class FirebaseAthentications {
           'food price': price,
           'image link': imageLink,
           'ingredient 1': compulsoryIngredient,
+          'active': true,
           // 'first ingredient': ingredient1,
           // 'second ingredient': ingredient2,
           // 'third ingredient': ingredient3,

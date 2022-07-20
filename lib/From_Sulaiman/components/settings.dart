@@ -19,6 +19,39 @@ class Setting extends StatefulWidget {
 }
 
 class _SettingState extends State<Setting> {
+  saveUpdateToDatabase(
+    TextEditingController update,
+    String fieldNameInFirestore,
+  ) {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (update.text.isNotEmpty) {
+      _firestore.collection('Restaurants').doc(_auth.currentUser!.uid).set({
+        fieldNameInFirestore: update.text
+      }, SetOptions(merge: true)).then((value) => {
+            if (fieldNameInFirestore == 'Community')
+              {
+                _firestore
+                    .collection('All restaurant profile Pictures')
+                    .doc(_auth.currentUser!.uid)
+                    .set({'location': update.text}, SetOptions(merge: true))
+              },
+            if (fieldNameInFirestore == 'Restaurant Name')
+              {
+                _firestore
+                    .collection('All restaurant profile Pictures')
+                    .doc(_auth.currentUser!.uid)
+                    .set({'restaurant name': update.text},
+                        SetOptions(merge: true)),
+              },
+            if (fieldNameInFirestore == 'Email')
+              {
+                user?.updateEmail(update.text),
+                print('email was updated successfully'),
+              }
+          });
+    }
+  }
+
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   FirebaseAuth _auth = FirebaseAuth.instance;
@@ -41,18 +74,18 @@ class _SettingState extends State<Setting> {
   File? imageFileForTheCoverPhoto;
   File? imageFileForTheProfilePhoto;
 
-  Future<String?> getEmailName() async {
-    var restName;
-    var result = await FirebaseFirestore.instance
-        .collection('Restaurants Database')
-        .doc(FirebaseAuth.instance.currentUser!.uid)
-        .get()
-        .then((value) => {
-              restaurantNameFromFirebase = value['Restaurant Name'],
-              restName = value['Restaurant Name'],
-            });
-    return restName;
-  }
+  // Future<String?> getEmailName() async {
+  //   var restName;
+  //   var result = await FirebaseFirestore.instance
+  //       .collection('Restaurants Database')
+  //       .doc(FirebaseAuth.instance.currentUser!.uid)
+  //       .get()
+  //       .then((value) => {
+  //             restaurantNameFromFirebase = value['Restaurant Name'],
+  //             restName = value['Restaurant Name'],
+  //           });
+  //   return restName;
+  // }
 
   final TextEditingController email = TextEditingController();
 
@@ -97,6 +130,9 @@ class _SettingState extends State<Setting> {
             .doc(FirebaseAuth.instance.currentUser!.uid)
             .snapshots(),
         builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return CircularProgressIndicator();
+          }
           return TextFormField(
             autofocus: false,
             controller: restaurantName,
@@ -130,6 +166,9 @@ class _SettingState extends State<Setting> {
             .doc(FirebaseAuth.instance.currentUser!.uid)
             .snapshots(),
         builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return CircularProgressIndicator();
+          }
           return TextFormField(
             autofocus: false,
             controller: restaurantFullAddress,
@@ -163,30 +202,34 @@ class _SettingState extends State<Setting> {
             .doc(FirebaseAuth.instance.currentUser!.uid)
             .snapshots(),
         builder: (context, snapshot) {
-          return TextFormField(
-            autofocus: false,
-            controller: restaurantPhoneNumber,
-            keyboardType: TextInputType.number,
-            validator: (value) {
-              RegExp regexp = RegExp(r'^.{3,}$');
-              if (value!.isEmpty) {
-                return ('Contact is required');
-              }
-              if (!regexp.hasMatch(value)) {
-                return ("Please enter a valid number");
-              }
-            },
-            onSaved: (value) {
-              restaurantPhoneNumber.text = value!;
-            },
-            textInputAction: TextInputAction.next,
-            decoration: InputDecoration(
-                prefixIcon: const Icon(Icons.phone),
-                contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-                hintText: snapshot.data!['Phone Number'],
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10))),
-          );
+          if (snapshot.hasData) {
+            return TextFormField(
+              autofocus: false,
+              controller: restaurantPhoneNumber,
+              keyboardType: TextInputType.number,
+              validator: (value) {
+                RegExp regexp = RegExp(r'^.{3,}$');
+                if (value!.isEmpty) {
+                  return ('Contact is required');
+                }
+                if (!regexp.hasMatch(value)) {
+                  return ("Please enter a valid number");
+                }
+              },
+              onSaved: (value) {
+                restaurantPhoneNumber.text = value!;
+              },
+              textInputAction: TextInputAction.next,
+              decoration: InputDecoration(
+                  prefixIcon: const Icon(Icons.phone),
+                  contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
+                  hintText: snapshot.data!['Phone Number'],
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10))),
+            );
+          } else {
+            return CircularProgressIndicator();
+          }
         });
 
     //=====================community input filed ==============================//
@@ -233,12 +276,15 @@ class _SettingState extends State<Setting> {
         padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
         minWidth: MediaQuery.of(context).size.width,
         onPressed: () {
-          if (email.text.isNotEmpty) {
-            _firestore
-                .collection('Restaurants')
-                .doc(_auth.currentUser!.uid)
-                .set({'Email': email.text}, SetOptions(merge: true));
-          }
+          saveUpdateToDatabase(email, 'Email');
+          saveUpdateToDatabase(
+            restaurantName,
+            'Restaurant Name',
+          );
+          saveUpdateToDatabase(restaurantFullAddress, 'Community');
+
+          saveUpdateToDatabase(restaurantPhoneNumber, 'Phone Number');
+          saveUpdateToDatabase(community, 'Restaurant Full Address');
         },
         child: const Text(
           'Update Setting',
@@ -430,7 +476,7 @@ class _SettingState extends State<Setting> {
 
   @override
   void initState() {
-    getEmailName();
+    // getEmailName();
     super.initState();
   }
 
