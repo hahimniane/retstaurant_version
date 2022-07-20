@@ -1,21 +1,16 @@
 import 'dart:io';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:path/path.dart';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 
-import '../../components/methods.dart';
-import '../../post_registration/create_menu_page.dart';
-import '../../post_registration/upload_restaurant_menu_photo.dart';
 import '../../services/firbase.dart';
-import '../../trial_page_for textfield.dart';
+
 import '../../upoading_new_menu.dart';
 
 class Menu extends StatefulWidget {
-  Menu({
+  const Menu({
     Key? key,
   }) : super(key: key);
 
@@ -24,9 +19,9 @@ class Menu extends StatefulWidget {
 }
 
 class _MenuState extends State<Menu> {
-  final _formKey = GlobalKey<FormState>();
-  TextEditingController? _nameController;
-  static List friendsList = [null];
+  //final _formKey = GlobalKey<FormState>();
+  // TextEditingController? _nameController;
+  //  static List friendsList = [null];
   var currentUser = FirebaseAuth.instance.currentUser;
 
   final Stream<QuerySnapshot> _usersStream = FirebaseFirestore.instance
@@ -75,135 +70,135 @@ class _MenuState extends State<Menu> {
 
   @override
   Widget build(BuildContext context) {
-    double height = MediaQuery.of(context).size.height;
-    double width = MediaQuery.of(context).size.height;
+    // double height = MediaQuery.of(context).size.height;
+    // double width = MediaQuery.of(context).size.height;
 
-    final nameField = TextFormField(
-      autofocus: false,
-      controller: name,
-      keyboardType: TextInputType.text,
-      validator: (value) {
-        RegExp regexp = RegExp(r'^.{3,}$');
-        if (value!.isEmpty) {
-          return ('food name is required');
-        }
-        if (!regexp.hasMatch(value)) {
-          return ("Food name can't be less than 3 char");
-        }
-      },
-      onSaved: (value) {
-        name.text = value!;
-      },
-      textInputAction: TextInputAction.next,
-      decoration: InputDecoration(
-          prefixIcon: const Icon(Icons.food_bank),
-          contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-          hintText: "Food Name",
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
-    );
+    // final nameField = TextFormField(
+    //   autofocus: false,
+    //   controller: name,
+    //   keyboardType: TextInputType.text,
+    //   validator: (value) {
+    //     RegExp regexp = RegExp(r'^.{3,}$');
+    //     if (value!.isEmpty) {
+    //       return ('food name is required');
+    //     }
+    //     if (!regexp.hasMatch(value)) {
+    //       return ("Food name can't be less than 3 char");
+    //     }
+    //   },
+    //   onSaved: (value) {
+    //     name.text = value!;
+    //   },
+    //   textInputAction: TextInputAction.next,
+    //   decoration: InputDecoration(
+    //       prefixIcon: const Icon(Icons.food_bank),
+    //       contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
+    //       hintText: "Food Name",
+    //       border: OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
+    // );
     //=====================food name input filed ==============================//
-    final ingredients = <TextFormField>[
-      // thought of this but a little confuse
-    ];
+    // final ingredients = <TextFormField>[
+    //   // thought of this but a little confuse
+    // ];
 
     //=====================food name input filed ==============================//
-    final descField = TextFormField(
-      autofocus: false,
-      controller: desc,
-      keyboardType: TextInputType.text,
-      validator: (value) {
-        RegExp regexp = RegExp(r'^.{3,}$');
-        if (value!.isEmpty) {
-          return ('food description is required');
-        }
-        if (!regexp.hasMatch(value)) {
-          return ("Description can't be less than 3 char");
-        }
-      },
-      onSaved: (value) {
-        desc.text = value!;
-      },
-      textInputAction: TextInputAction.next,
-      decoration: InputDecoration(
-          prefixIcon: const Icon(Icons.fork_left),
-          contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-          hintText: "Food description",
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
-    );
+    // final descField = TextFormField(
+    //   autofocus: false,
+    //   controller: desc,
+    //   keyboardType: TextInputType.text,
+    //   validator: (value) {
+    //     RegExp regexp = RegExp(r'^.{3,}$');
+    //     if (value!.isEmpty) {
+    //       return ('food description is required');
+    //     }
+    //     if (!regexp.hasMatch(value)) {
+    //       return ("Description can't be less than 3 char");
+    //     }
+    //   },
+    //   onSaved: (value) {
+    //     desc.text = value!;
+    //   },
+    //   textInputAction: TextInputAction.next,
+    //   decoration: InputDecoration(
+    //       prefixIcon: const Icon(Icons.fork_left),
+    //       contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
+    //       hintText: "Food description",
+    //       border: OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
+    // );
     //=====================food name input filed ==============================//
-    final priceField = TextFormField(
-      autofocus: false,
-      controller: price,
-      keyboardType: TextInputType.number,
-      validator: (value) {
-        if (value!.isEmpty) {
-          return ('food price is required');
-        }
-      },
-      onSaved: (value) {
-        price.text = value!;
-      },
-      textInputAction: TextInputAction.next,
-      decoration: InputDecoration(
-          prefixIcon: const Icon(Icons.attach_money),
-          contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-          hintText: "Price",
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
-    );
-    final ingredientOneField = TextFormField(
-      autofocus: false,
-      controller: ingredientOne,
-      keyboardType: TextInputType.text,
-      validator: (value) {
-        if (value!.isEmpty) {
-          return ('Ingredient is required');
-        }
-      },
-      onSaved: (value) {
-        ingredientOne.text = value!;
-      },
-      textInputAction: TextInputAction.next,
-      decoration: InputDecoration(
-          // prefixIcon: Icon(Icons.),
-          contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-          hintText: "Ingredient 1",
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
-    );
-    final SaveButton = Material(
-      elevation: 2,
-      borderRadius: BorderRadius.circular(30),
-      color: Colors.pink,
-      child: MaterialButton(
-        height: MediaQuery.of(context).size.height * 0.20,
-        padding: const EdgeInsets.all(8.0),
-        minWidth: MediaQuery.of(context).size.width * 0.60,
-        onPressed: () async {
-          // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomeScreen()));
-          // await firebaseAthentications.signInUser(
-          //     emailController.text, passwordController.text, context);
-
-          // signIn(emailController.text, passwordController.text);
-          //------------------------------------------------------
-          loader = true;
-          // String result = await uploadFile();
-          // firebaseAthentications.getLastMenNumber(
-          //     name.text,
-          //     desc.text,
-          //     price.text,
-          //     result,
-          //     ingredientOne.text,
-          //     ingredientTwo.text,
-          //     ingredientThree.text);
-        },
-        child: const Text(
-          'Save',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-              fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
-        ),
-      ),
-    );
-    List<Widget> list = [];
+    // final priceField = TextFormField(
+    //   autofocus: false,
+    //   controller: price,
+    //   keyboardType: TextInputType.number,
+    //   validator: (value) {
+    //     if (value!.isEmpty) {
+    //       return ('food price is required');
+    //     }
+    //   },
+    //   onSaved: (value) {
+    //     price.text = value!;
+    //   },
+    //   textInputAction: TextInputAction.next,
+    //   decoration: InputDecoration(
+    //       prefixIcon: const Icon(Icons.attach_money),
+    //       contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
+    //       hintText: "Price",
+    //       border: OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
+    // );
+    // final ingredientOneField = TextFormField(
+    //   autofocus: false,
+    //   controller: ingredientOne,
+    //   keyboardType: TextInputType.text,
+    //   validator: (value) {
+    //     if (value!.isEmpty) {
+    //       return ('Ingredient is required');
+    //     }
+    //   },
+    //   onSaved: (value) {
+    //     ingredientOne.text = value!;
+    //   },
+    //   textInputAction: TextInputAction.next,
+    //   decoration: InputDecoration(
+    //       // prefixIcon: Icon(Icons.),
+    //       contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
+    //       hintText: "Ingredient 1",
+    //       border: OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
+    // );
+    // final SaveButton = Material(
+    //   elevation: 2,
+    //   borderRadius: BorderRadius.circular(30),
+    //   color: Colors.pink,
+    //   child: MaterialButton(
+    //     height: MediaQuery.of(context).size.height * 0.20,
+    //     padding: const EdgeInsets.all(8.0),
+    //     minWidth: MediaQuery.of(context).size.width * 0.60,
+    //     onPressed: () async {
+    //       // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomeScreen()));
+    //       // await firebaseAthentications.signInUser(
+    //       //     emailController.text, passwordController.text, context);
+    //
+    //       // signIn(emailController.text, passwordController.text);
+    //       //------------------------------------------------------
+    //       loader = true;
+    //       // String result = await uploadFile();
+    //       // firebaseAthentications.getLastMenNumber(
+    //       //     name.text,
+    //       //     desc.text,
+    //       //     price.text,
+    //       //     result,
+    //       //     ingredientOne.text,
+    //       //     ingredientTwo.text,
+    //       //     ingredientThree.text);
+    //     },
+    //     child: const Text(
+    //       'Save',
+    //       textAlign: TextAlign.center,
+    //       style: TextStyle(
+    //           fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+    //     ),
+    //   ),
+    // );
+    // List<Widget> list = [];
     return SafeArea(
         child: Column(
       children: [
@@ -213,8 +208,8 @@ class _MenuState extends State<Menu> {
             stream: _usersStream,
             builder:
                 (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-              if (snapshot.hasError) {
-                return const Text('Something went wrong');
+              if (!snapshot.hasData) {
+                return const CircularProgressIndicator();
               } else if (snapshot.data!.docs.isEmpty) {
                 // WidgetsBinding.instance.addPostFrameCallback((_) {
                 //   setState(() {
@@ -283,16 +278,16 @@ class _MenuState extends State<Menu> {
                   }).toList(),
                 );
               }
-              return ListView(
-                children: snapshot.data!.docs.map((DocumentSnapshot document) {
-                  Map<String, dynamic> data =
-                      document.data()! as Map<String, dynamic>;
-                  return ListTile(
-                    title: Text(data['full_name']),
-                    subtitle: Text(data['company']),
-                  );
-                }).toList(),
-              );
+              // return ListView(
+              //   children: snapshot.data!.docs.map((DocumentSnapshot document) {
+              //     Map<String, dynamic> data =
+              //         document.data()! as Map<String, dynamic>;
+              //     return ListTile(
+              //       title: Text(data['full_name']),
+              //       subtitle: Text(data['company']),
+              //     );
+              //   }).toList(),
+              // );
             },
           ),
         ),
@@ -313,7 +308,7 @@ class _MenuState extends State<Menu> {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => AddNewMenuPage()));
+                          builder: (context) => const AddNewMenuPage()));
 //                   showModalBottomSheet(
 //                       shape: const RoundedRectangleBorder(
 //                         borderRadius: BorderRadius.only(
@@ -597,35 +592,35 @@ class _MenuState extends State<Menu> {
   //   }
   // }
 
-  _getImage(type) async {
-    try {
-      var pickedFile;
-      if (type == 0) {
-        pickedFile = await ImagePicker().pickImage(
-          source: ImageSource.camera,
-          maxWidth: 1800,
-          maxHeight: 1800,
-        );
-      } else {
-        pickedFile = await ImagePicker().pickImage(
-          source: ImageSource.gallery,
-          maxWidth: 1800,
-          maxHeight: 1800,
-        );
-      }
-
-      if (pickedFile != null) {
-        File imageFile = File(pickedFile.path);
-
-        setState(() {
-          imageFile1 = File(pickedFile!.path);
-          print(imageFile);
-        });
-      }
-    } catch (e) {
-      print(e.toString());
-    }
-  }
+  // _getImage(type) async {
+  //   try {
+  //     var pickedFile;
+  //     if (type == 0) {
+  //       pickedFile = await ImagePicker().pickImage(
+  //         source: ImageSource.camera,
+  //         maxWidth: 1800,
+  //         maxHeight: 1800,
+  //       );
+  //     } else {
+  //       pickedFile = await ImagePicker().pickImage(
+  //         source: ImageSource.gallery,
+  //         maxWidth: 1800,
+  //         maxHeight: 1800,
+  //       );
+  //     }
+  //
+  //     if (pickedFile != null) {
+  //       File imageFile = File(pickedFile.path);
+  //
+  //       setState(() {
+  //         imageFile1 = File(pickedFile!.path);
+  //         print(imageFile);
+  //       });
+  //     }
+  //   } catch (e) {
+  //     print(e.toString());
+  //   }
+  // }
 
   // List<Widget> _getFriends() {
   //   List<Widget> friendsTextFields = [];
@@ -647,30 +642,30 @@ class _MenuState extends State<Menu> {
   //   return friendsTextFields;
   // }
 
-  Widget _addRemoveButton(bool add, int index) {
-    return InkWell(
-      onTap: () {
-        if (add) {
-          // add new text-fields at the top of all friends textfields
-          friendsList.insert(0, '');
-        } else
-          friendsList.removeAt(index);
-        setState(() {});
-      },
-      child: Container(
-        width: 30,
-        height: 30,
-        decoration: BoxDecoration(
-          color: (add) ? Colors.green : Colors.red,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Icon(
-          (add) ? Icons.add : Icons.remove,
-          color: Colors.white,
-        ),
-      ),
-    );
-  }
+  // Widget _addRemoveButton(bool add, int index) {
+  //   return InkWell(
+  //     onTap: () {
+  //       if (add) {
+  //         // add new text-fields at the top of all friends textfields
+  //         friendsList.insert(0, '');
+  //       } else
+  //         friendsList.removeAt(index);
+  //       setState(() {});
+  //     },
+  //     child: Container(
+  //       width: 30,
+  //       height: 30,
+  //       decoration: BoxDecoration(
+  //         color: (add) ? Colors.green : Colors.red,
+  //         borderRadius: BorderRadius.circular(20),
+  //       ),
+  //       child: Icon(
+  //         (add) ? Icons.add : Icons.remove,
+  //         color: Colors.white,
+  //       ),
+  //     ),
+  //   );
+  // }
 }
 /*
 *     loader = true;
