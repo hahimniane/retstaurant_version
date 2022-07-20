@@ -13,36 +13,11 @@ class PenOrders extends StatelessWidget {
     Key? key,
   }) : super(key: key);
   buildCard(
-      Icon icon, String title, StreamBuilder subtitle, StreamBuilder trailing) {
+      Icon icon, String title, StreamBuilder subtitle, StreamBuilder trailing,
+      {required VoidCallback whenYouTapp}) {
     return Card(
       child: TextButton(
-        onPressed: () {
-          print('hello world');
-          // myFunction() {
-          //   final a = FirebaseFirestore.instance
-          //       .collection('Customers')
-          //       .doc('Qbv3t2lsJNgQq9uFftTBNYiBbLq2')
-          //       .collection('Orders')
-          //       .get();
-          //
-          //   a.then(
-          //     (value) => {
-          //       // print(FirebaseAuth.instance.currentUser!.uid),
-          //       if (value.docs.isNotEmpty)
-          //         {
-          //           for (int i = 0; i < value.size; ++i)
-          //             {print(value.docs[i].id)}
-          //         }
-          //       else
-          //         {
-          //           print('it is empty'),
-          //         }
-          //     },
-          //   );
-          // }
-          //
-          // myFunction();
-        },
+        onPressed: whenYouTapp,
         child: ListTile(
             leading: icon,
             title: Text('$title'),
@@ -119,6 +94,160 @@ class PenOrders extends StatelessWidget {
                   }
                 },
               ),
+              whenYouTapp: () {
+                showModalBottomSheet<void>(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return Container(
+                      color: Colors.white,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white10,
+                          border: Border.all(width: 2, color: Colors.black),
+                          borderRadius: BorderRadius.circular(40),
+                        ),
+                        height: MediaQuery.of(context).size.height * 0.60,
+                        child: SingleChildScrollView(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              SizedBox(
+                                height: 15,
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: [
+                                  TextButton(
+                                    style: TextButton.styleFrom(
+                                        elevation: 4,
+                                        backgroundColor: Colors.green.shade500),
+                                    onPressed: () {},
+                                    child: const Text(
+                                      'Call Bike for delivery',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ),
+                                  TextButton(
+                                    style: TextButton.styleFrom(
+                                        elevation: 4,
+                                        backgroundColor: Colors.red),
+                                    onPressed: () {},
+                                    child: const Text(
+                                      'Decline order',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  )
+                                ],
+                              ),
+                              StreamBuilder<QuerySnapshot>(
+                                stream: FirebaseFirestore.instance
+                                    .collection('Restaurants')
+                                    .doc(FirebaseAuth.instance.currentUser!.uid)
+                                    .collection('Pending Orders')
+                                    .doc(snapshot.data!.docs[i].reference.id)
+                                    .collection('Order')
+                                    .snapshots(),
+                                builder: (BuildContext context,
+                                    AsyncSnapshot<dynamic> lastSnapshot) {
+                                  if (!lastSnapshot.hasData) {
+                                    return const CircularProgressIndicator();
+                                  }
+                                  return ListView.builder(
+                                    itemCount: lastSnapshot.data.docs.length,
+                                    scrollDirection: Axis.vertical,
+                                    shrinkWrap: true,
+                                    itemBuilder:
+                                        (BuildContext context, int index) {
+                                      var document =
+                                          lastSnapshot.data.docs[index];
+                                      return Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Card(
+                                          child: Column(
+                                            children: [
+                                              ListTile(
+                                                  leading:
+                                                      const Text('Menu Name: '),
+                                                  trailing: Text(
+                                                      document['food name'])
+                                                  // Image.network(
+                                                  //     document['image link']),
+                                                  ),
+                                              ListTile(
+                                                  leading: const Text(
+                                                      'amount of items: '),
+                                                  trailing: Text(document[
+                                                          'amount of items']
+                                                      .toString())
+                                                  // Image.network(
+                                                  //     document['image link']),
+                                                  ),
+                                              ListTile(
+                                                  leading: const Text(
+                                                      'Total Price: '),
+                                                  trailing: Text((int.parse(
+                                                                  document[
+                                                                      'food price']) *
+                                                              document[
+                                                                  'amount of items'])
+                                                          .toString() +
+                                                      ' GNF')
+                                                  // Image.network(
+                                                  //     document['image link']),
+                                                  ),
+                                              ListTile(
+                                                  leading:
+                                                      const Text('Ketchup: '),
+                                                  trailing: document[
+                                                              'ketchup'] ==
+                                                          true
+                                                      ? const Icon(Icons.done)
+                                                      : const Icon(Icons.cancel)
+                                                  // Image.network(
+                                                  //     document['image link']),
+                                                  ),
+                                              ListTile(
+                                                  leading: const Text(
+                                                      'Mayonnaise: '),
+                                                  trailing: document[
+                                                              'mayonnaise'] ==
+                                                          true
+                                                      ? const Icon(Icons.done)
+                                                      : const Icon(Icons.cancel)
+                                                  // Image.network(
+                                                  //     document['image link']),
+                                                  ),
+                                              const Divider()
+                                              //   lastSnapshot.data[index
+                                              //       ? SizedBox(
+                                              //           height: 20,
+                                              //         )
+                                              //       : SizedBox(
+                                              //           height: 0,
+                                              //         )
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    // children: lastSnapshot.data!.docs
+                                    //     .map<Widget>(
+                                    //         (DocumentSnapshot document) {
+                                    //   Map<String, dynamic> data = document
+                                    //       .data()! as Map<String, dynamic>;
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
             ),
           ),
         );
