@@ -14,14 +14,14 @@ class PenOrders extends StatelessWidget {
   PenOrders({
     Key? key,
   }) : super(key: key);
-  buildCard(
-      Icon icon, String title, StreamBuilder subtitle, StreamBuilder trailing,
+  buildCard(Widget imageUrl, String title, StreamBuilder subtitle,
+      StreamBuilder trailing,
       {required VoidCallback whenYouTapp}) {
     return Card(
       child: TextButton(
         onPressed: whenYouTapp,
         child: ListTile(
-            leading: icon,
+            leading: imageUrl,
             title: Text('$title'),
             subtitle: subtitle,
             //   Text('$subtitle'),
@@ -55,7 +55,19 @@ class PenOrders extends StatelessWidget {
           children: List.generate(
             snapshot.data!.docs.length,
             (i) => buildCard(
-              const Icon(Icons.person, size: 40, color: Colors.pink),
+              FutureBuilder<DocumentSnapshot>(
+                future: snapshot.data!.docs[i].reference
+                    .collection('Order')
+                    .doc('1')
+                    .get(),
+                builder:
+                    (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                  if (!snapshot.hasData) {
+                    return SizedBox();
+                  }
+                  return Image.network(snapshot.data['image link']);
+                },
+              ),
               snapshot.data!.docs[i].id,
               StreamBuilder(
                 stream: snapshot.data!.docs[i].reference
