@@ -1,13 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class PenOrders extends StatelessWidget {
   final _usersStream = FirebaseFirestore.instance
       .collection('Restaurants')
       .doc(FirebaseAuth.instance.currentUser!.uid)
-      .collection('Pending Orders')
-      .snapshots();
+      .collection('Pending Orders');
+
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   PenOrders({
     Key? key,
@@ -32,7 +34,7 @@ class PenOrders extends StatelessWidget {
   Widget build(BuildContext context) {
     var date;
     return StreamBuilder<QuerySnapshot>(
-      stream: _usersStream,
+      stream: _usersStream.snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasError) {
           return const Text('Something went wrong');
@@ -112,31 +114,96 @@ class PenOrders extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.center,
                             mainAxisSize: MainAxisSize.min,
                             children: <Widget>[
-                              SizedBox(
+                              const SizedBox(
                                 height: 15,
                               ),
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceAround,
                                 children: [
-                                  TextButton(
-                                    style: TextButton.styleFrom(
-                                        elevation: 4,
-                                        backgroundColor: Colors.green.shade500),
-                                    onPressed: () {},
-                                    child: const Text(
-                                      'Call Bike for delivery',
-                                      style: TextStyle(color: Colors.white),
-                                    ),
+                                  Expanded(
+                                    child: StreamBuilder<DocumentSnapshot>(
+                                        stream: snapshot.data!.docs[i].reference
+                                            .snapshots(),
+                                        builder: (context, snapshot1) {
+                                          if (!snapshot1.hasData) {
+                                            return const Center(
+                                              child:
+                                                  CircularProgressIndicator(),
+                                            );
+                                          }
+                                          return TextButton(
+                                              style: TextButton.styleFrom(
+                                                  elevation: 4,
+                                                  backgroundColor:
+                                                      Colors.green.shade500),
+                                              onPressed: () async {
+                                                if (snapshot1
+                                                        .data!['bike called'] ==
+                                                    '1') {
+                                                  await Fluttertoast.showToast(
+                                                          gravity: ToastGravity
+                                                              .CENTER,
+                                                          backgroundColor:
+                                                              Colors.green,
+                                                          msg:
+                                                              'the bike is already on its way')
+                                                      .then((value) => {
+                                                            // Navigator.pop(
+                                                            //     context)
+                                                          });
+                                                } else {
+                                                  snapshot
+                                                      .data!.docs[i].reference
+                                                      .update({
+                                                    'call bike': false,
+                                                    'bike called': '1',
+                                                  }).then((value) async => {
+                                                            await Fluttertoast.showToast(
+                                                                    gravity:
+                                                                        ToastGravity
+                                                                            .CENTER,
+                                                                    backgroundColor:
+                                                                        Colors
+                                                                            .green,
+                                                                    msg:
+                                                                        'the bike  is already  on its way')
+                                                                .then((value) =>
+                                                                    {
+                                                                      Navigator.pop(
+                                                                          context)
+                                                                    })
+                                                          });
+                                                }
+                                              },
+                                              child: snapshot1
+                                                          .data!['call bike'] ==
+                                                      false
+                                                  ? const Text(
+                                                      'Bike  is on its way',
+                                                      style: TextStyle(
+                                                          color: Colors.white),
+                                                    )
+                                                  : const Text(
+                                                      'Call Bike for delivery',
+                                                      style: TextStyle(
+                                                          color: Colors.white),
+                                                    ));
+                                        }),
                                   ),
-                                  TextButton(
-                                    style: TextButton.styleFrom(
-                                        elevation: 4,
-                                        backgroundColor: Colors.red),
-                                    onPressed: () {},
-                                    child: const Text(
-                                      'Decline order',
-                                      style: TextStyle(color: Colors.white),
+                                  const SizedBox(
+                                    width: 15,
+                                  ),
+                                  Expanded(
+                                    child: TextButton(
+                                      style: TextButton.styleFrom(
+                                          elevation: 4,
+                                          backgroundColor: Colors.red),
+                                      onPressed: () {},
+                                      child: const Text(
+                                        'Decline order',
+                                        style: TextStyle(color: Colors.white),
+                                      ),
                                     ),
                                   )
                                 ],
@@ -164,71 +231,83 @@ class PenOrders extends StatelessWidget {
                                           lastSnapshot.data.docs[index];
                                       return Padding(
                                         padding: const EdgeInsets.all(8.0),
-                                        child: Card(
-                                          child: Column(
-                                            children: [
-                                              ListTile(
-                                                  leading:
-                                                      const Text('Menu Name: '),
-                                                  trailing: Text(
-                                                      document['food name'])
-                                                  // Image.network(
-                                                  //     document['image link']),
-                                                  ),
-                                              ListTile(
-                                                  leading: const Text(
-                                                      'amount of items: '),
-                                                  trailing: Text(document[
-                                                          'amount of items']
-                                                      .toString())
-                                                  // Image.network(
-                                                  //     document['image link']),
-                                                  ),
-                                              ListTile(
-                                                  leading: const Text(
-                                                      'Total Price: '),
-                                                  trailing: Text((int.parse(
+                                        child: Column(
+                                          children: [
+                                            Card(
+                                              child: Column(
+                                                children: [
+                                                  ListTile(
+                                                      leading: const Text(
+                                                          'Menu Name: '),
+                                                      trailing: Text(
+                                                          document['food name'])
+                                                      // Image.network(
+                                                      //     document['image link']),
+                                                      ),
+                                                  ListTile(
+                                                      leading: const Text(
+                                                          'amount of items: '),
+                                                      trailing: Text(document[
+                                                              'amount of items']
+                                                          .toString())
+                                                      // Image.network(
+                                                      //     document['image link']),
+                                                      ),
+                                                  ListTile(
+                                                      leading: const Text(
+                                                          'Total Price: '),
+                                                      trailing: Text((int.parse(
+                                                                      document[
+                                                                          'food price']) *
                                                                   document[
-                                                                      'food price']) *
-                                                              document[
-                                                                  'amount of items'])
-                                                          .toString() +
-                                                      ' GNF')
-                                                  // Image.network(
-                                                  //     document['image link']),
-                                                  ),
-                                              ListTile(
-                                                  leading:
-                                                      const Text('Ketchup: '),
-                                                  trailing: document[
-                                                              'ketchup'] ==
-                                                          true
-                                                      ? const Icon(Icons.done)
-                                                      : const Icon(Icons.cancel)
-                                                  // Image.network(
-                                                  //     document['image link']),
-                                                  ),
-                                              ListTile(
-                                                  leading: const Text(
-                                                      'Mayonnaise: '),
-                                                  trailing: document[
-                                                              'mayonnaise'] ==
-                                                          true
-                                                      ? const Icon(Icons.done)
-                                                      : const Icon(Icons.cancel)
-                                                  // Image.network(
-                                                  //     document['image link']),
-                                                  ),
-                                              const Divider()
-                                              //   lastSnapshot.data[index
-                                              //       ? SizedBox(
-                                              //           height: 20,
-                                              //         )
-                                              //       : SizedBox(
-                                              //           height: 0,
-                                              //         )
-                                            ],
-                                          ),
+                                                                      'amount of items'])
+                                                              .toString() +
+                                                          ' GNF')
+                                                      // Image.network(
+                                                      //     document['image link']),
+                                                      ),
+                                                  ListTile(
+                                                      leading: const Text(
+                                                          'Ketchup: '),
+                                                      trailing:
+                                                          document['ketchup'] ==
+                                                                  true
+                                                              ? const Icon(
+                                                                  Icons.done)
+                                                              : const Icon(
+                                                                  Icons.cancel)
+                                                      // Image.network(
+                                                      //     document['image link']),
+                                                      ),
+                                                  ListTile(
+                                                      leading: const Text(
+                                                          'Mayonnaise: '),
+                                                      trailing: document[
+                                                                  'mayonnaise'] ==
+                                                              true
+                                                          ? const Icon(
+                                                              Icons.done)
+                                                          : const Icon(
+                                                              Icons.cancel)
+                                                      // Image.network(
+                                                      //     document['image link']),
+                                                      ),
+
+                                                  //   lastSnapshot.data[index
+                                                  //       ? SizedBox(
+                                                  //           height: 20,
+                                                  //         )
+                                                  //       : SizedBox(
+                                                  //           height: 0,
+                                                  //         )
+                                                ],
+                                              ),
+                                            ),
+                                            const Divider(
+                                              color: Colors.black,
+                                              thickness: 2,
+                                            )
+                                          ],
                                         ),
                                       );
                                     },
